@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>73</integer>
+		<key>InstrumentName</key>
+		<string>Flute</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>1</integer>
+		<key>InstrumentName</key>
+		<string>Acoustic Grand Piano</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>5</integer>
+		<key>InstrumentName</key>
+		<string>Electric Piano 1</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>10</integer>
+		<key>InstrumentName</key>
+		<string>Glockenspiel</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>11</integer>
+		<key>InstrumentName</key>
+		<string>Music Box</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>12</integer>
+		<key>InstrumentName</key>
+		<string>Vibraphone</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>13</integer>
+		<key>InstrumentName</key>
+		<string>Marimba</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>14</integer>
+		<key>InstrumentName</key>
+		<string>Xylophone</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>17</integer>
+		<key>InstrumentName</key>
+		<string>Drawbar Organ</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>18</integer>
+		<key>InstrumentName</key>
+		<string>Percussive Organ</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>19</integer>
+		<key>InstrumentName</key>
+		<string>Rock Organ</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>21</integer>
+		<key>InstrumentName</key>
+		<string>Reed Organ</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>22</integer>
+		<key>InstrumentName</key>
+		<string>Accordion</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>24</integer>
+		<key>InstrumentName</key>
+		<string>Tango Accordion</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>26</integer>
+		<key>InstrumentName</key>
+		<string>Acoustic Guitar (steel)</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>29</integer>
+		<key>InstrumentName</key>
+		<string>Electric Guitar (muted)</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>30</integer>
+		<key>InstrumentName</key>
+		<string>Overdriven Guitar</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>31</integer>
+		<key>InstrumentName</key>
+		<string>Distortion Guitar</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>48</integer>
+		<key>InstrumentName</key>
+		<string>Timpani</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>52</integer>
+		<key>InstrumentName</key>
+		<string>SynthStrings 2</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>53</integer>
+		<key>InstrumentName</key>
+		<string>Choir Aahs</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>54</integer>
+		<key>InstrumentName</key>
+		<string>Voice Oohs</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>55</integer>
+		<key>InstrumentName</key>
+		<string>Synth Voice</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>56</integer>
+		<key>InstrumentName</key>
+		<string>Orchestra Hit</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>57</integer>
+		<key>InstrumentName</key>
+		<string>Trumpet</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>59</integer>
+		<key>InstrumentName</key>
+		<string>Tuba</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>60</integer>
+		<key>InstrumentName</key>
+		<string>Muted Trumpet</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>64</integer>
+		<key>InstrumentName</key>
+		<string>SynthBrass 2</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>65</integer>
+		<key>InstrumentName</key>
+		<string>Soprano Sax</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>68</integer>
+		<key>InstrumentName</key>
+		<string>Baritone Sax</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>71</integer>
+		<key>InstrumentName</key>
+		<string>Bassoon</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>75</integer>
+		<key>InstrumentName</key>
+		<string>Recorder</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>80</integer>
+		<key>InstrumentName</key>
+		<string>Ocarina</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>81</integer>
+		<key>InstrumentName</key>
+		<string>Lead 1 (square)</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>88</integer>
+		<key>InstrumentName</key>
+		<string>Lead 8 (bass + lead)</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>89</integer>
+		<key>InstrumentName</key>
+		<string>Pad 1 (new age)</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>93</integer>
+		<key>InstrumentName</key>
+		<string>Pad 5 (bowed)</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>108</integer>
+		<key>InstrumentName</key>
+		<string>Koto</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>110</integer>
+		<key>InstrumentName</key>
+		<string>Bag pipe</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>113</integer>
+		<key>InstrumentName</key>
+		<string>Tinkle Bell</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>114</integer>
+		<key>InstrumentName</key>
+		<string>Agogo</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>116</integer>
+		<key>InstrumentName</key>
+		<string>Woodblock</string>
+	</dict>
+	<dict>
+		<key>InstrumentNumber</key>
+		<integer>117</integer>
+		<key>InstrumentName</key>
+		<string>Taiko Drum</string>
+	</dict>
+</array>
+</plist>

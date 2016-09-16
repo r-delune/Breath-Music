@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<array>
+		<dict>
+			<key>ScaleName</key>
+			<string>C Major</string>
+			<key>ScaleRootNote</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>ScaleName</key>
+			<string>D Major</string>
+			<key>ScaleRootNote</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>ScaleName</key>
+			<string>E Major</string>
+			<key>ScaleRootNote</key>
+			<integer>4</integer>
+		</dict>
+		<dict>
+			<key>ScaleName</key>
+			<string>F Major</string>
+			<key>ScaleRootNote</key>
+			<integer>5</integer>
+		</dict>
+		<dict>
+			<key>ScaleName</key>
+			<string>G Major</string>
+			<key>ScaleRootNote</key>
+			<integer>7</integer>
+		</dict>
+		<dict>
+			<key>ScaleName</key>
+			<string>A Major</string>
+			<key>ScaleRootNote</key>
+			<integer>9</integer>
+		</dict>
+		<dict>
+			<key>ScaleName</key>
+			<string>B Major</string>
+			<key>ScaleRootNote</key>
+			<integer>11</integer>
+		</dict>
+	</array>
+</plist>

@@ -1,0 +1,4 @@
+The file InfoPlist.strings contains:
+/* Localized versions of Info.plist keys */
+
+

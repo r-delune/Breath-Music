@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: A Scottish Soldier</string>
+		<key>SongFileName</key>
+		<string>a-scottisch-soldier</string>
+		<key>SongTempo</key>
+		<integer>90</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Auld Lang Syne</string>
+		<key>SongFileName</key>
+		<string>auld-lang-syne</string>
+		<key>SongTempo</key>
+		<integer>96</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Beethoven Fur Elise</string>
+		<key>SongFileName</key>
+		<string>fur-elise</string>
+		<key>SongTempo</key>
+		<integer>72</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Beethoven Sonatina in G Major</string>
+		<key>SongFileName</key>
+		<string>sonatine</string>
+		<key>SongTempo</key>
+		<integer>128</integer>
+		<key>SongPartCount</key>
+		<integer>6</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Beethoven Symphony No. 5</string>
+		<key>SongFileName</key>
+		<string>symphony-no5</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>7</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Boyne Water</string>
+		<key>SongFileName</key>
+		<string>Boyne-water</string>
+		<key>SongTempo</key>
+		<integer>108</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Brahms Hungarian Dance No. 5</string>
+		<key>SongFileName</key>
+		<string>hungarian-dance</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Careless Love</string>
+		<key>SongFileName</key>
+		<string>careless-love</string>
+		<key>SongTempo</key>
+		<integer>88</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Dargason</string>
+		<key>SongFileName</key>
+		<string>dargason</string>
+		<key>SongTempo</key>
+		<integer>112</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Day By Day</string>
+		<key>SongFileName</key>
+		<string>day-by-day</string>
+		<key>SongTempo</key>
+		<integer>88</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Early One Morning</string>
+		<key>SongFileName</key>
+		<string>early-one-morning</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Frankie and Johnny</string>
+		<key>SongFileName</key>
+		<string>frankie-and-johnny</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>6</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: In Dulci Jubilo</string>
+		<key>SongFileName</key>
+		<string>in-dulci-jubilo</string>
+		<key>SongTempo</key>
+		<integer>122</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Just a Closer Walk with Thee</string>
+		<key>SongFileName</key>
+		<string>just-a-closer-walk</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Mozart Ein Kleine Nachtmusik</string>
+		<key>SongFileName</key>
+		<string>ein-kleine-nachtmusik</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>7</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Mozart Papagenos Aria</string>
+		<key>SongFileName</key>
+		<string>mozart-papagenos-aria</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Mozart Symphony No. 40</string>
+		<key>SongFileName</key>
+		<string>mozart-symph-no40</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Offenbach Galop Infernal</string>
+		<key>SongFileName</key>
+		<string>galop-inferrnal</string>
+		<key>SongTempo</key>
+		<integer>160</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Oh My Darling Clementine</string>
+		<key>SongFileName</key>
+		<string>oh-my-dar</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Old Joe Clark</string>
+		<key>SongFileName</key>
+		<string>old-joe-clark</string>
+		<key>SongTempo</key>
+		<integer>160</integer>
+		<key>SongPartCount</key>
+		<integer>6</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Ravel Bolero Main Sequence</string>
+		<key>SongFileName</key>
+		<string>bolero</string>
+		<key>SongTempo</key>
+		<integer>72</integer>
+		<key>SongPartCount</key>
+		<integer>1</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Rossini William Tell</string>
+		<key>SongFileName</key>
+		<string>william-tell</string>
+		<key>SongTempo</key>
+		<integer>152</integer>
+		<key>SongPartCount</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Scarborough Fair</string>
+		<key>SongFileName</key>
+		<string>scarborough-fair</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Somewhere Over The Rainbow</string>
+		<key>SongFileName</key>
+		<string>somewhere</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: The Morning Dew</string>
+		<key>SongFileName</key>
+		<string>the-morning-dew</string>
+		<key>SongTempo</key>
+		<integer>92</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Tico Tico No Fuba</string>
+		<key>SongFileName</key>
+		<string>tico-tico</string>
+		<key>SongTempo</key>
+		<integer>116</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: Vivaldi Spring</string>
+		<key>SongFileName</key>
+		<string>spring</string>
+		<key>SongTempo</key>
+		<integer>108</integer>
+		<key>SongPartCount</key>
+		<integer>6</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Adult: When The Saints</string>
+		<key>SongFileName</key>
+		<string>when-the-saints</string>
+		<key>SongTempo</key>
+		<integer>112</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Alle Eendjes</string>
+		<key>SongFileName</key>
+		<string>alle-eendjes</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Berend Botje</string>
+		<key>SongFileName</key>
+		<string>berend-botje</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Deze Wuist Op Deze Vuist</string>
+		<key>SongFileName</key>
+		<string>deze-vuist</string>
+		<key>SongTempo</key>
+		<integer>70</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Een Twee Drie Vier</string>
+		<key>SongFileName</key>
+		<string>een-twee-dri-vier</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Eine Kleine Geige</string>
+		<key>SongFileName</key>
+		<string>einen-kleine-geige</string>
+		<key>SongTempo</key>
+		<integer>90</integer>
+		<key>SongPartCount</key>
+		<integer>7</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Er Zat Een Klein Zigeunermeisje</string>
+		<key>SongFileName</key>
+		<string>zigeunermeisje</string>
+		<key>SongTempo</key>
+		<integer>170</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Faya Sitong</string>
+		<key>SongFileName</key>
+		<string>faya-sitong</string>
+		<key>SongTempo</key>
+		<integer>80</integer>
+		<key>SongPartCount</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Good King Wenceslas</string>
+		<key>SongFileName</key>
+		<string>good-king</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Happy Birthday</string>
+		<key>SongFileName</key>
+		<string>happy-birthday</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Helikopter</string>
+		<key>SongFileName</key>
+		<string>helikopter</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>6</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Herfst Herfst</string>
+		<key>SongFileName</key>
+		<string>herfst</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: If Youre Happy And You Know It</string>
+		<key>SongFileName</key>
+		<string>if-youre-happy</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: London Bridge Is Falling Down</string>
+		<key>SongFileName</key>
+		<string>london-bridge</string>
+		<key>SongTempo</key>
+		<integer>95</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Michael Finnegan</string>
+		<key>SongFileName</key>
+		<string>michel-finnegan</string>
+		<key>SongTempo</key>
+		<integer>90</integer>
+		<key>SongPartCount</key>
+		<integer>2</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Mulberry Gut</string>
+		<key>SongFileName</key>
+		<string>mulberry-gut</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: O Wat Zijn We Heden Blij</string>
+		<key>SongFileName</key>
+		<string>o-wat-zijn-we</string>
+		<key>SongTempo</key>
+		<integer>200</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Op Een Grote Paddestoel</string>
+		<key>SongFileName</key>
+		<string>paddestoel</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Op Een Klein Stationnetje</string>
+		<key>SongFileName</key>
+		<string>stationnetje</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Poesje Mauw</string>
+		<key>SongFileName</key>
+		<string>poesje-mauw</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Round And Round</string>
+		<key>SongFileName</key>
+		<string>round-and-round-the-village</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Row Your Boat</string>
+		<key>SongFileName</key>
+		<string>row-your-boat</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Schaapje Heb Je Witte Wol</string>
+		<key>SongFileName</key>
+		<string>schaapje</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>6</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Sleep My Child</string>
+		<key>SongFileName</key>
+		<string>sleep-my-child</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Tarara</string>
+		<key>SongFileName</key>
+		<string>tarara</string>
+		<key>SongTempo</key>
+		<integer>160</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Three Blind Mice</string>
+		<key>SongFileName</key>
+		<string>three-blind-mice</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Toemba</string>
+		<key>SongFileName</key>
+		<string>toemba</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Twinkle Twinkle Little Star</string>
+		<key>SongFileName</key>
+		<string>twinkle</string>
+		<key>SongTempo</key>
+		<integer>100</integer>
+		<key>SongPartCount</key>
+		<integer>6</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Vader Jacob</string>
+		<key>SongFileName</key>
+		<string>vader-jacob</string>
+		<key>SongTempo</key>
+		<integer>105</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Visje Visje</string>
+		<key>SongFileName</key>
+		<string>visje</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>4</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Wheels On The Bus</string>
+		<key>SongFileName</key>
+		<string>wheels</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Yankee Doodle</string>
+		<key>SongFileName</key>
+		<string>yankey-doodle</string>
+		<key>SongTempo</key>
+		<integer>200</integer>
+		<key>SongPartCount</key>
+		<integer>8</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Zeg Roodkapje</string>
+		<key>SongFileName</key>
+		<string>zer-roodkapje</string>
+		<key>SongTempo</key>
+		<integer>80</integer>
+		<key>SongPartCount</key>
+		<integer>2</integer>
+	</dict>
+	<dict>
+		<key>SongDisplayName</key>
+		<string>Child: Zo Gaat De Molen</string>
+		<key>SongFileName</key>
+		<string>zo-gaat-de-molen</string>
+		<key>SongTempo</key>
+		<integer>120</integer>
+		<key>SongPartCount</key>
+		<integer>2</integer>
+	</dict>
+</array>
+</plist>

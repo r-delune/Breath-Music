@@ -1,0 +1,1306 @@
+The file SongAudioEngine.h contains:
+//
+//  SongAudioEngine.h
+//  BreathMusic
+//
+//  Created by barry on 08/09/2014.
+//  Copyright (c) 2014 rocudo. All rights reserved.
+//
+
+#import "SequenceData.h"
+#import <Foundation/Foundation.h>
+#import <AudioToolbox/AudioToolbox.h>
+
+@protocol SongEngineProtocol <NSObject>
+
+-(void)stictchedSongPassedIndex:(int)index;
+-(void)logOutput:(NSString*)log;
+-(void)reset;
+@end
+
+@interface SongAudioEngine : NSObject
+@property (nonatomic) MusicPlayer musicPlayer;
+@property (nonatomic) MusicSequence currentSequence;
+@property(nonatomic,unsafe_unretained)id<SongEngineProtocol>delegate;
+
+
+-(void)playIndex:(int)index;
+-(void)cleanup;
+-(void)setMidiStyle:(NSDictionary*)style;
+-(void)playMIDIFile;
+-(void)setInstrument:(int)instrument;
+-(void)loadMIDIFile;
+-(void)setSongWithID:(int)theid;
+-(void)beginBreath;
+-(void)stopBreath;
+-(void)stitchMidiData;
+@end
+
+The file SongAudioEngine.m contains:
+//
+//  SongAudioEngine.m
+//  BreathMusic
+//
+//  Created by barry on 08/09/2014.
+//  Copyright (c) 2014 rocudo. All rights reserved.
+//
+
+#import "SongAudioEngine.h"
+#import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
+#import <CoreAudio/CoreAudioTypes.h>
+#import "GDCoreAudioUtils.h"
+#import "GCDQueue.h"
+#import "NoteEvent.h"
+#import "SequenceData.h"
+#import "Instrument.h"
+#define MAX_TRACKS 20
+
+@interface SongAudioEngine ()
+
+@property (readwrite) AUGraph processingGraph;
+@property (readwrite) AUNode ioNode;
+@property (readwrite) AudioUnit mixerUnit;
+
+@property (readwrite) AudioUnit ioUnit;
+
+@property (nonatomic,strong) SequenceData  *lastSequence;
+@property (readwrite) NSMutableArray  *chordSequences;
+
+@property (nonatomic, readwrite)int tempo;
+@property (nonatomic, readwrite)int beatsperbar;
+@property (nonatomic, readwrite)int stylenumber;
+@property(readwrite)NSInteger  currentbeat;
+@property(nonatomic,strong)NSString  *firstChord;
+
+@property(nonatomic,strong)NSMutableArray  *instruments;
+
+@property int currentBeat;
+
+@property(nonatomic,strong)NSString *currentInstrument;
+@property(readwrite)UInt8 currentPresetNumber;
+
+@property int numparts;
+@property(nonatomic,strong)NSString  *filename;
+
+
+@property int lastIndex;
+
+@property MusicTimeStamp fullLength;
+@property MusicTimeStamp position;
+
+@property(nonatomic,strong)NSTimer *stitchTimer;
+@property(nonatomic,strong)NSMutableArray  *stitchTimes;
+
+@end
+@implementation SongAudioEngine
+-(void)setSongWithID:(int)theid
+{
+
+}
+-(void)setMidiStyle:(NSDictionary*)style 
+{
+   
+       self.tempo=[[style valueForKey:@"SongTempo"]intValue];
+
+    self.numparts=[[style valueForKey:@"SongPartCount"]intValue];
+    self.filename=[style valueForKey:@"SongFileName"];
+    
+}
+- (id) init
+{
+    if ( self = [super init] ) {
+        self.chordSequences=[NSMutableArray new];
+        self.instruments=[NSMutableArray new];
+        for (int i=0; i<MAX_TRACKS; i++) {
+            
+            Instrument  *instrument=[Instrument new];
+            [self.instruments addObject:instrument];
+        }
+        // [self setupStereoStreamFormat];
+        [self createAUGraph];
+        self.stylenumber=21;
+        self.beatsperbar=4;
+        self.tempo=110;
+        
+        
+        
+        
+    }
+    
+    return self;
+}
+-(void)createAUGraph
+{
+    
+    OSStatus result = noErr;
+	AUNode ioNode, mixerNode;
+    
+    
+    // Specify the common portion of an audio unit's identify, used for both audio units
+    // in the graph.
+	AudioComponentDescription cd = {};
+	cd.componentManufacturer     = kAudioUnitManufacturer_Apple;
+    
+    // Instantiate an audio processing graph
+	result = NewAUGraph (&_processingGraph);
+    NSCAssert (result == noErr, @"Unable to create an AUGraph object. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+	//Specify the Sampler unit, to be used as the first node of the graph
+	cd.componentType = kAudioUnitType_MusicDevice;
+	cd.componentSubType = kAudioUnitSubType_Sampler;
+	
+    
+    // Node which will be used to play our midi not with a particular sound font
+    AUNode node;
+    // Create nodes for all the voices
+    for(int i=0; i<MAX_TRACKS; i++) {
+        
+        Instrument  *instrument=self.instruments[i];
+        // Create a new sampler note
+        
+        result = AUGraphAddNode (_processingGraph, &cd, &node);
+        instrument.instrumentNode=node;
+        // Check for any errors
+        
+        // Encode the node and add it to the array of sampler notes for later
+    }
+    
+    
+	// Specify the Output unit, to be used as the second and final node of the graph
+	cd.componentType = kAudioUnitType_Output;
+	cd.componentSubType = kAudioUnitSubType_RemoteIO;
+    
+    // Add the Output unit node to the graph
+	result = AUGraphAddNode (_processingGraph, &cd, &ioNode);
+    NSCAssert (result == noErr, @"Unable to add the Output unit to the audio processing graph. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+    // Add the mixer unit to the graph
+    cd.componentType = kAudioUnitType_Mixer;
+    cd.componentSubType = kAudioUnitSubType_MultiChannelMixer;
+    
+    result = AUGraphAddNode (_processingGraph, &cd, &mixerNode);
+    NSCAssert (result == noErr, @"Unable to add the Output unit to the audio processing graph. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+    
+    // Open the graph
+	result = AUGraphOpen (_processingGraph);
+    NSCAssert (result == noErr, @"Unable to open the audio processing graph. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+    // Now that the graph is open get references to all the nodes and store
+    // them as audio units
+    
+    AudioUnit samplerUnit;
+    // Loop over the sampler notes
+    
+    for(int i=0; i<[self.instruments count]; i++) {
+        // Extract the sampler note from the NSValue into the samplerNode variable
+        
+        Instrument *instrument=self.instruments[i];
+        node=instrument.instrumentNode;
+        // Get a reference to the sampler node and store it in the samplerUnit variable
+        result = AUGraphNodeInfo (_processingGraph, node, 0, &samplerUnit);
+        instrument.instrumentUnit=samplerUnit;
+        
+        NSCAssert (result == noErr, @"Unable to obtain a reference to the Sampler unit. Error code: %d '%.4s'", (int) result, (const char *)&result);
+        
+    }
+    
+    
+    // Create a new mixer unit. This is necessary because we have a number of sampler
+    // units which we need to output through the speakers. Each of these channels needs
+    // to be mixed together to create one output
+	result = AUGraphNodeInfo (_processingGraph, mixerNode, 0, &_mixerUnit);
+    NSCAssert (result == noErr, @"Unable to obtain a reference to the Sampler unit. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+	// Obtain a reference to the I/O unit from its node
+	result = AUGraphNodeInfo (_processingGraph, ioNode, 0, &_ioUnit);
+    NSCAssert (result == noErr, @"Unable to obtain a reference to the I/O unit. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+    // Define the number of input busses
+    UInt32 busCount   = [self.instruments count];
+    
+    // Set the input channels property on the mixer unit
+    result = AudioUnitSetProperty (
+                                   _mixerUnit,
+                                   kAudioUnitProperty_ElementCount,
+                                   kAudioUnitScope_Input,
+                                   0,
+                                   &busCount,
+                                   sizeof (busCount)
+                                   );
+    NSCAssert (result == noErr, @"AudioUnitSetProperty Set mixer bus count. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+    // Connect the nodes to the mixer node
+    for(int i=0; i<[self.instruments count]; i++) {
+        // Extract the sampler unit
+        Instrument *instrument=self.instruments[i];
+        node=instrument.instrumentNode;
+        
+        
+        // Connect the sampler unit to the mixer unit
+        result = AUGraphConnectNodeInput(_processingGraph, node, 0, mixerNode, i);
+        
+        // Set the volume of the channel
+        AudioUnitSetParameter(_mixerUnit, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, i,1, 0);
+        
+        NSCAssert (result == noErr, @"Couldn't connect speech synth unit output (0) to mixer input (1). Error code: %d '%.4s'", (int) result, (const char *)&result);
+    }
+    
+    // Connect the output of the mixer node to the input of he io node
+    result = AUGraphConnectNodeInput (_processingGraph, mixerNode, 0, ioNode, 0);
+    NSCAssert (result == noErr, @"Unable to interconnect the nodes in the audio processing graph. Error code: %d '%.4s'", (int) result, (const char *)&result);
+    
+  //  AUGraphAddRenderNotify(_processingGraph, renderCallback, (__bridge void*) self);
+    
+	CAShow(self.processingGraph);
+    
+    [self startGraph];
+
+    
+}
+- (void) startGraph
+{
+    if (self.processingGraph) {
+        // this calls the AudioUnitInitialize function of each AU in the graph.
+        // validates the graph's connections and audio data stream formats.
+        // propagates stream formats across the connections
+        Boolean outIsInitialized;
+        CheckError(AUGraphIsInitialized(self.processingGraph,
+                                        &outIsInitialized), "AUGraphIsInitialized");
+        if(!outIsInitialized)
+            CheckError(AUGraphInitialize(self.processingGraph), "AUGraphInitialize");
+        
+        Boolean isRunning;
+        CheckError(AUGraphIsRunning(self.processingGraph,
+                                    &isRunning), "AUGraphIsRunning");
+        if(!isRunning)
+            CheckError(AUGraphStart(self.processingGraph), "AUGraphStart");
+    }
+}
+- (void) stopAUGraph {
+    
+    NSLog (@"Stopping audio processing graph");
+    Boolean isRunning = false;
+    CheckError(AUGraphIsRunning (self.processingGraph, &isRunning), "AUGraphIsRunning");
+    
+    if (isRunning) {
+        CheckError(AUGraphStop(self.processingGraph), "AUGraphStop");
+    }
+}
+#pragma mark - Sampler
+
+- (void) setupSampler:(UInt8) pn samplerUnit:(AudioUnit)unit track:(int)track;
+{
+    // propagates stream formats across the connections
+    Boolean outIsInitialized;
+    CheckError(AUGraphIsInitialized(self.processingGraph,
+                                    &outIsInitialized), "AUGraphIsInitialized");
+    if(!outIsInitialized) {
+        return;
+    }
+    if(pn < 0 || pn > 127) {
+        return;
+    }
+    NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
+    /* bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
+     pathForResource:@"gs_instruments" ofType:@"dls"]];*/
+    NSLog(@"set pn %d", pn);
+    
+    // fill out a bank preset data structure
+    AUSamplerBankPresetData bpdata;
+    if (track==9) {
+        bpdata.bankURL  = (__bridge CFURLRef) presetURL;
+        bpdata.bankMSB  = kAUSampler_DefaultPercussionBankMSB;
+        bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
+        bpdata.presetID = (UInt8) pn;
+        
+    }else
+    {
+        bpdata.bankURL  = (__bridge CFURLRef) presetURL;
+        bpdata.bankMSB  = kAUSampler_DefaultMelodicBankMSB;
+        bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
+        bpdata.presetID = (UInt8) pn;
+        
+    }
+    
+    
+    // set the kAUSamplerProperty_LoadPresetFromBank property
+    CheckError(AudioUnitSetProperty(unit,
+                                    kAUSamplerProperty_LoadPresetFromBank,
+                                    kAudioUnitScope_Global,
+                                    0,
+                                    &bpdata,
+                                    sizeof(bpdata)), "kAUSamplerProperty_LoadPresetFromBank");
+    
+    // AudioUnitAddRenderNotify(self.samplerUnit, synthRenderCallback, (__bridge void *)(self));
+    
+    NSLog (@"sampler ready");
+}
+-(void)loadMIDIFile
+{
+    CheckError(NewMusicPlayer(&_musicPlayer), "NewMusicPlayer");
+    CheckError(NewMusicSequence(&_currentSequence), "NewMusicSequence");
+    
+    CheckError(MusicSequenceSetAUGraph(self.currentSequence, self.processingGraph),
+               "MusicSequenceSetAUGraph");
+    
+    NSMutableArray  *midifilenames=[NSMutableArray new];
+    
+    for (int i=0; i<self.numparts; i++) {
+        int num=i+1;
+        
+        
+        [midifilenames addObject:[NSString stringWithFormat:@"%@_part%i",self.filename,num]];
+        SequenceData  *dataA=[[SequenceData alloc]init];
+        [self.chordSequences addObject:dataA];
+
+    }
+
+    
+    
+    for (int i=0;i<[self.chordSequences count]; i++)
+    {
+        SequenceData  *data=self.chordSequences[i];
+        NSURL *midiFileURL = [[NSURL alloc] initFileURLWithPath:
+                              [[NSBundle mainBundle] pathForResource:midifilenames[i]
+                                                              ofType:@"mid"]];
+        
+        CheckError(MusicSequenceFileLoad(data.sequence,
+                                         (__bridge CFURLRef) midiFileURL,
+                                         0, // can be zero in many cases
+                                         kMusicSequenceLoadSMF_ChannelsToTracks), "MusicSequenceFileLoad");
+        
+        CheckError(MusicSequenceSetAUGraph(data.sequence, self.processingGraph),
+                   "MusicSequenceSetAUGraph");
+        
+        [data parseEvents];
+    }
+    
+    
+    
+    SequenceData  *data1=self.chordSequences[0];
+    
+    UInt32 trackCount;
+    CheckError(MusicSequenceGetTrackCount(data1.sequence, &trackCount), "MusicSequenceGetTrackCount");
+    // NSLog(@"Number of tracks: %lu", trackCount);
+    if (trackCount>MAX_TRACKS) {
+        trackCount=MAX_TRACKS;
+    }
+    
+    for(int i = 0; i < trackCount; i++)
+    {
+        
+        MusicTrack track = NULL;
+        MusicTimeStamp trackLen = 0;
+        UInt32 trackLenLen = sizeof(trackLen);
+        MusicSequenceGetIndTrack(data1.sequence, i, &track);
+        MusicTrackGetProperty(track, kSequenceTrackProperty_TrackLength, &trackLen, &trackLenLen);
+        MusicTrack tracknew = NULL;
+        MusicSequenceNewTrack(self.currentSequence, &tracknew);
+       // MusicTrackCopyInsert(track, 0, trackLen, tracknew, 0);
+        Instrument  *instrument=self.instruments[i];
+        AUNode node=instrument.instrumentNode;
+        MusicTrackSetDestNode(tracknew, node);
+          SequenceTrack  *strack=data1.tracks[i];
+         AudioUnit  unit=instrument.instrumentUnit;
+         [self setupSampler:strack.presetNumber samplerUnit:unit track:i];
+    }
+    
+    
+    CheckError(MusicPlayerSetSequence(self.musicPlayer, self.currentSequence), "MusicPlayerSetSequence");
+   // [self copyTracksFromSequence:data1];
+    
+
+    
+}
+
+-(void)stitchMidiData
+{
+    
+    if (self.stitchTimes) {
+       // [self.stitchTimes removeAllObjects];
+       // self.stitchTimes=nil;
+        return;
+    }
+    
+    self.stitchTimes=[NSMutableArray new];
+    [self clearMainSequence];
+    UInt32 trackCount;
+    MusicTimeStamp test=0;
+    MusicTimeStamp runningLen=0;
+
+    for (int i=0;i<[self.chordSequences count]; i++)
+    {
+        SequenceData  *data=self.chordSequences[i];
+        
+        MusicSequence msequence=data.sequence;
+        CheckError(MusicSequenceGetTrackCount(msequence, &trackCount), "MusicSequenceGetTrackCount");
+        MusicTimeStamp trackLen = 0;
+
+        for(int i = 0; i < trackCount; i++)
+        {
+            
+            UInt32 trackLenLen = sizeof(trackLen);
+            MusicTrack track = NULL;
+            MusicTrack tmpTrack;
+            MusicSequenceGetIndTrack(msequence, i, &tmpTrack);
+
+            MusicTrackGetProperty(tmpTrack, kSequenceTrackProperty_TrackLength, &trackLen, &trackLenLen);
+            MusicSequenceGetIndTrack(self.currentSequence, i, &track);
+            MusicTrackGetProperty(track, kSequenceTrackProperty_TrackLength, &runningLen, &trackLenLen);
+
+            MusicTrackCopyInsert(tmpTrack, 0, trackLen, track, runningLen);
+        }
+        
+        self.fullLength+=trackLen;
+
+        NSNumber  *value=[NSNumber numberWithFloat:floor(test)];
+        
+        //if ([self.stitchTimes count]>0) {
+           // float last=[[self.stitchTimes lastObject]floatValue];
+            
+           // if (last!=runningLen) {
+              //  [self.stitchTimes addObject:value];
+
+           // }
+
+       // }else
+       // {
+            [self.stitchTimes addObject:value];
+      //  [self.delegate logOutput:[NSString stringWithFormat:@"new strictch time== %f",test]];
+
+       // }
+        test+=trackLen;
+
+        
+
+    }
+    
+    [[GCDQueue mainQueue]queueBlock:^{
+        [self beginTimer];
+
+    }];
+
+}
+-(void)clearMainSequence
+{
+    UInt32 trackCount;
+
+    CheckError(MusicSequenceGetTrackCount(self.currentSequence, &trackCount), "MusicSequenceGetTrackCount");
+    // NSLog(@"Number of tracks: %lu", trackCount);
+    
+    
+    for(int i = 0; i < trackCount; i++)
+    {
+        MusicTimeStamp trackLen = 0;
+        UInt32 trackLenLen = sizeof(trackLen);
+        
+        MusicTrack track = NULL;
+        MusicTrack tmpTrack;
+        MusicSequenceGetIndTrack(self.currentSequence, i, &tmpTrack);
+        MusicTrackGetProperty(tmpTrack, kSequenceTrackProperty_TrackLength, &trackLen, &trackLenLen);
+        
+        
+        MusicSequenceGetIndTrack(self.currentSequence, i, &track);
+        
+        MusicTrackClear(track, 0, trackLen);
+        
+        MusicTrackCut(track, 0, trackLen);
+        
+        
+    }
+    
+    
+
+}
+-(void)copyTracksFromSequence:(SequenceData*)sequence
+{
+UInt32 trackCount;
+    
+    if (!sequence) {
+        return;
+    }
+    
+    
+    MusicSequence msequence=sequence.sequence;
+    CheckError(MusicSequenceGetTrackCount(msequence, &trackCount), "MusicSequenceGetTrackCount");
+    // NSLog(@"Number of tracks: %lu", trackCount);
+    
+
+    for(int i = 0; i < trackCount; i++)
+    {
+        MusicTimeStamp trackLen = 0;
+        UInt32 trackLenLen = sizeof(trackLen);
+        
+        MusicTrack track = NULL;
+        MusicTrack tmpTrack;
+        MusicSequenceGetIndTrack(msequence, i, &tmpTrack);
+        MusicTrackGetProperty(tmpTrack, kSequenceTrackProperty_TrackLength, &trackLen, &trackLenLen);
+        
+        
+        MusicSequenceGetIndTrack(self.currentSequence, i, &track);
+        
+        MusicTrackClear(track, 0, trackLen);
+        
+        
+        MusicTrackCopyInsert(tmpTrack, 0, trackLen, track, 0);
+        
+        SequenceTrack  *vtrack=sequence.tracks[i];
+        AudioUnitSetParameter(_mixerUnit, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, i,vtrack.volume, 0);
+        
+    }
+    
+
+    
+}
+- (void) playMIDIFile
+{
+    //A USER HIT A KEY BEFORE HITTING START
+    
+    if (self.musicPlayer) {
+        return;
+    }
+    if (!self.musicPlayer) {
+        [self loadMIDIFile];
+        
+    }
+    
+    
+    NSLog(@"starting music player");
+    
+     MusicTrack tempoTrack;
+    
+    MusicSequenceGetTempoTrack (self.currentSequence, &tempoTrack);
+    MusicTrackNewExtendedTempoEvent(tempoTrack, 0, self.tempo);
+    
+    
+    
+
+    
+  
+    
+    //self.lastSequence=self.chordSequences[1];
+    
+}
+
+-(void) cleanup
+{
+    
+    MusicPlayerStop(self.musicPlayer);
+    
+    AUGraphStop(self.processingGraph);
+    AUGraphClearConnections(self.processingGraph);
+    AUGraphUninitialize(self.processingGraph);
+    
+    for (int i=0; i<[self.chordSequences count]; i++) {
+        SequenceData  *data=self.chordSequences[i];
+        [data cleanup];
+    }
+    
+    
+    
+}
+-(void)playIndex:(int)index
+{
+    if (!self.musicPlayer) {
+        return;
+        
+    }
+    Boolean isplaying;
+    MusicPlayerIsPlaying(self.musicPlayer, &isplaying);
+    
+    
+    //    CheckError(MusicPlayerStart(self.musicPlayer), "MusicPlayerStart");
+
+    if (!isplaying) {
+        //[self stitchMidiData];
+        CheckError(MusicPlayerStart(self.musicPlayer), "MusicPlayerStart");
+        
+    }
+    
+   // [self clearMainSequence];
+
+    SequenceData  *data=self.chordSequences[index];
+    MusicPlayerStop(self.musicPlayer);
+    MusicPlayerSetSequence(self.musicPlayer, data.sequence);
+    //[self copyTracksFromSequence:data];
+    CheckError(MusicSequenceSetAUGraph(data.sequence, self.processingGraph),
+               "MusicSequenceSetAUGraph");
+    MusicPlayerSetTime(self.musicPlayer, 0.0f);
+    MusicPlayerPreroll(self.musicPlayer);
+    MusicPlayerStart(self.musicPlayer);
+    
+
+}
+-(void)setInstrument:(int)instrument
+{
+    self.currentPresetNumber=instrument;
+    
+    NSURL *bankURL;
+    /*
+     bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
+     pathForResource:@"FluidR3_GM" ofType:@"sf2"]];
+     */
+    bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
+                                                  pathForResource:@"yamaha" ofType:@"sf2"]];
+    NSLog(@"set pn %d", instrument);
+    
+    // fill out a bank preset data structure
+    AUSamplerBankPresetData bpdata;
+    bpdata.bankURL  = (__bridge CFURLRef) bankURL;
+    bpdata.bankMSB  = kAUSampler_DefaultMelodicBankMSB;
+    bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
+    bpdata.presetID = (UInt8) instrument;
+    
+      for(int i=0; i<[self.instruments count]; i++) {
+        // Extract the sampler note from the NSValue into the samplerNode variable
+        
+        Instrument *instrument=self.instruments[i];
+             CheckError(AudioUnitSetProperty(instrument.instrumentUnit,
+                                        kAUSamplerProperty_LoadPresetFromBank,
+                                        kAudioUnitScope_Global,
+                                        0,
+                                        &bpdata,
+                                        sizeof(bpdata)), "kAUSamplerProperty_LoadPresetFromBank");
+    }
+
+   
+}
+-(void)beginBreath
+{
+    if (!self.musicPlayer) {
+        return;
+        
+    }
+    Boolean isplaying;
+    MusicPlayerIsPlaying(self.musicPlayer, &isplaying);
+    
+    
+    //    CheckError(MusicPlayerStart(self.musicPlayer), "MusicPlayerStart");
+    
+    if (!isplaying) {
+        
+       // [self.delegate logOutput:@"not playing"];
+        [self stitchMidiData];
+        CheckError(MusicPlayerStart(self.musicPlayer), "MusicPlayerStart");
+        MusicPlayerSetTime(self.musicPlayer, self.position);
+        
+
+    }
+    
+    
+}
+-(void)beginTimer
+{
+    if (self.stitchTimer) {
+        [self.stitchTimer invalidate];
+        self.stitchTimer=nil;
+    }
+    
+    self.stitchTimer=[NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(stitchTimerHandler:) userInfo:nil repeats:YES];
+}
+-(void)stitchTimerHandler:(NSTimer*)timer
+{
+    
+    MusicTimeStamp  pos;
+    MusicPlayerGetTime(self.musicPlayer, &pos);
+   // int found=0;
+    //[self.delegate logOutput:[NSString stringWithFormat:@"current pos == %f",pos]];
+    
+    for (int i=0; i<[self.stitchTimes count]; i++) {
+        
+        NSNumber  *value=self.stitchTimes[i];
+        
+        if (pos>=[value floatValue]) {
+            
+            NSNumber  *newval=[NSNumber numberWithFloat:2147483650];
+            self.stitchTimes[i]=newval;
+            [self.delegate stictchedSongPassedIndex:i];
+            //found=i;
+            return;
+        }
+    }
+    
+    if (pos>=self.fullLength) {
+        [self stopBreath];
+       // [self.delegate reset];
+       // self.delegate=nil;
+       // [timer invalidate];
+        
+    }
+    
+}
+
+
+-(void)stopBreath
+{
+    MusicPlayerStop(self.musicPlayer);
+
+    MusicTimeStamp  pos;
+    MusicPlayerGetTime(self.musicPlayer, &pos);
+    self.position=pos;
+    if (pos>=self.fullLength) {
+        [self.delegate reset];
+        if (self.stitchTimer) {
+            [self.stitchTimer invalidate];
+            self.stitchTimer=nil;
+        }
+        
+    }
+
+}
+@end
+
+The file SongViewController.h contains:
+//
+//  SongViewController.h
+//  BreathMusic
+//
+//  Created by barry on 08/09/2014.
+//  Copyright (c) 2014 rocudo. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "KeyDetectViewController.h"
+@interface SongViewController : KeyDetectViewController
+
+@property(nonatomic,weak)IBOutlet UIButton  *toggleDirectionButton;
+-(IBAction)toggleButtonHit:(id)sender;
+-(IBAction)test:(id)sender;
+@property(nonatomic,weak)IBOutlet  UIButton  *testbutton;
+-(IBAction)test2:(id)sender;
+@property(nonatomic,weak)IBOutlet  UIButton  *stoptestbutton;
+@end
+
+The file SongViewController.m contains:
+//
+//  SongViewController.m
+//  BreathMusic
+//
+//  Created by barry on 08/09/2014.
+//  Copyright (c) 2014 rocudo. All rights reserved.
+//
+#import <QuartzCore/QuartzCore.h>
+#import "UIGlossyButton.h"
+
+#import "UIView+LayerEffects.h"
+#import "SongViewController.h"
+#import "SongModeTableViewController.h"
+#import "SongAudioEngine.h"
+#import "GCDQueue.h"
+#import "InstrumentTableViewController.h"
+@interface SongViewController ()<SongModeTableViewProtocol,InstrumentTableViewProtocol,SongEngineProtocol>
+-(IBAction)mainMenu:(id)sender;
+-(IBAction)songButtonHit:(id)sender;
+@property(nonatomic,weak)IBOutlet UIGlossyButton  *songSelectButton;
+@property(nonatomic,strong)UIPopoverController  *popover;
+@property(nonatomic,strong)NSMutableArray  *songButtons;
+@property(nonatomic,strong)NSMutableArray  *songParts;
+@property(nonatomic,strong)SongAudioEngine  *audioEngine;
+
+@property (nonatomic,strong) InstrumentTableViewController *instrumenttableViewController;
+
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button1;
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button2;
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button3;
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button4;
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button5;
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button6;
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button7;
+@property(nonatomic,weak)IBOutlet  UIGlossyButton  *button8;
+@property(nonatomic,weak)IBOutlet UIGlossyButton  *instrumentButton;
+@property NSInteger lasttime;
+
+@property(nonatomic,strong)SongModeTableViewController *tableViewController;
+@property(nonatomic,strong)NSArray  *buttonArray;
+
+@property(nonatomic,strong)NSDictionary  *lastsong;
+@property int numparts;
+
+@property BOOL useInhale;
+@property int buttonIndex;
+-(IBAction)button1hit:(id)sender;
+-(IBAction)button2hit:(id)sender;
+-(IBAction)button3hit:(id)sender;
+-(IBAction)button4hit:(id)sender;
+-(IBAction)button5hit:(id)sender;
+-(IBAction)button6hit:(id)sender;
+-(IBAction)button7hit:(id)sender;
+-(IBAction)button8hit:(id)sender;
+
+-(IBAction)instrumentButtonHit:(id)sender;
+@end
+
+@implementation SongViewController
+
+-(void)logOutput:(NSString *)log
+{
+    [super sendLogToOutput:log];
+}
+-(void)stictchedSongPassedIndex:(int)index
+{
+    if (index>=[self.buttonArray count]) {
+        return;
+    }
+    
+    [[GCDQueue mainQueue]queueBlock:^{
+        [self highlightButton:self.buttonArray[index]];
+        [super sendLogToOutput:[NSString stringWithFormat:@"highlight %i",index]];
+    }];
+}
+-(IBAction)instrumentButtonHit:(id)sender
+{
+    UIButton *button = (UIButton*)sender;
+    
+    self.instrumenttableViewController = [[InstrumentTableViewController alloc] initWithStyle:UITableViewStylePlain];
+    
+    self.instrumenttableViewController.delegate=self;
+    _popover= [[UIPopoverController alloc] initWithContentViewController:self.instrumenttableViewController];
+    [_popover presentPopoverFromRect:CGRectMake(button.frame.size.width / 2, button.frame.size.height / 1, 1, 1) inView:button permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+}
+-(void)instrumentSelected:(NSDictionary *)instrument
+{
+    
+    NSString *name=[instrument valueForKey:@"InstrumentName"];
+    //self.instrumentButton.titleLabel.text=[NSString stringWithFormat:@"Instrument : %@",instrument];
+    [self.instrumentButton setTitle:[NSString stringWithFormat:@"Instrument : %@",name] forState:UIControlStateNormal];
+    [_popover dismissPopoverAnimated:YES];
+    
+    int presetNumber=[[instrument valueForKey:@"InstrumentNumber"]intValue];
+    [self.audioEngine setInstrument:presetNumber ];
+    
+    
+}
+-(IBAction)button1hit:(id)sender
+{
+    
+    [self.audioEngine playIndex:0];
+}
+-(IBAction)button2hit:(id)sender{
+
+    [self.audioEngine playIndex:1];
+
+}
+    
+    
+    
+-(IBAction)button3hit:(id)sender{
+    [self.audioEngine playIndex:2];
+
+}
+-(IBAction)button4hit:(id)sender{
+    [self.audioEngine playIndex:3];
+
+}
+-(IBAction)button5hit:(id)sender{
+    [self.audioEngine playIndex:4];
+
+}
+-(IBAction)button6hit:(id)sender{
+    [self.audioEngine playIndex:5];
+
+}
+-(IBAction)button7hit:(id)sender{
+    [self.audioEngine playIndex:6];
+
+}
+-(IBAction)button8hit:(id)sender{
+    
+    [self.audioEngine playIndex:7];
+    
+}
+-(void)reset
+{
+    [self songSelected:self.lastsong];
+}
+-(void)songSelected:(NSDictionary *)dict
+{
+    self.buttonIndex=-1;
+    self.lastsong=dict;
+    [self.popover dismissPopoverAnimated:YES];
+
+    [self highlightButton:self.button1];
+    
+    NSString  *styleName=[dict valueForKey:@"SongDisplayName"];
+    [self sendLogToOutput:styleName];
+    
+    [[GCDQueue mainQueue]queueBlock:^{
+    //SongDisplayName
+    //SongFileName
+    //SongPartCount
+        
+        self.button1.alpha=0;
+        self.button2.alpha=0;
+        self.button3.alpha=0;
+        self.button4.alpha=0;
+        self.button5.alpha=0;
+        self.button6.alpha=0;
+        self.button7.alpha=0;
+        self.button8.alpha=0;
+        
+        self.numparts=[[dict valueForKey:@"SongPartCount"]intValue];
+        
+        for (int i=0; i<self.numparts; i++) {
+            
+            [self.buttonArray[i] setAlpha:1.0];
+        }
+
+    
+    [self.songSelectButton setTitle:styleName forState:UIControlStateNormal];
+
+    
+    
+        if (self.audioEngine) {
+            [self.audioEngine cleanup];
+        }
+        
+        
+        self.audioEngine = [[SongAudioEngine alloc] init];
+        
+        
+        
+        [self.audioEngine setMidiStyle:dict];
+        
+        
+        
+        [self.audioEngine playMIDIFile];
+
+       // [self pushButtonForIndex:0];
+       // [self.audioEngine stitchMidiData];
+    }];
+
+   
+}
+-(IBAction)songButtonHit:(id)sender
+{
+    UIButton *button = (UIButton*)sender;
+    
+    SongModeTableViewController *tableViewController = [[SongModeTableViewController alloc] initWithStyle:UITableViewStylePlain];
+    
+    tableViewController.delegate=self;
+    _popover= [[UIPopoverController alloc] initWithContentViewController:tableViewController];
+    [_popover presentPopoverFromRect:CGRectMake(button.frame.size.width / 2, button.frame.size.height / 1, 1, 1) inView:button permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+
+}
+-(IBAction)toggleButtonHit:(id)sender
+
+{
+    
+    if (self.useInhale) {
+        self.useInhale=NO;
+        [self.toggleDirectionButton setImage:[UIImage imageNamed:@"SWITCH-Breath-EXHALE"] forState:UIControlStateNormal];
+        
+    }else
+    {
+        self.useInhale=YES;
+        [self.toggleDirectionButton setImage:[UIImage imageNamed:@"SWITCH-Breath-INHALE"] forState:UIControlStateNormal];
+    }
+
+}
+-(IBAction)mainMenu:(id)sender
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [[GCDQueue mainQueue]queueBlock:^{
+    
+        [self.audioEngine cleanup];
+    }];
+}
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    self.buttonIndex=0;
+   // [self midiNoteBegan:nil];
+    self.buttonArray=@[self.button1,self.button2,self.button3,self.button4,self.button5,self.button6,self.button7,self.button8];
+    // Do any additional setup after loading the view.
+   //36:58:97)
+    [self.button1 useWhiteLabel: YES];
+    self.button1.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button1 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+  //  [self.button1 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    
+    [self.button2 useWhiteLabel: YES];
+    self.button2.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button2 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+  //  [self.button2 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.button3 useWhiteLabel: YES];
+    self.button3.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button3 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+  //  [self.button3 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.button4 useWhiteLabel: YES];
+    self.button4.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button4 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+  //  [self.button4 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.button5 useWhiteLabel: YES];
+    self.button5.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button5 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+  //  [self.button5 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.button6 useWhiteLabel: YES];
+    self.button6.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button6 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+  //  [self.button6 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.button7 useWhiteLabel: YES];
+    self.button7.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button7 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+   // [self.button7 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.button8 useWhiteLabel: YES];
+    self.button8.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.button8 setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+  //  [self.button8 setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.songSelectButton useWhiteLabel: YES];
+    self.songSelectButton.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.songSelectButton setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+   // [self.songSelectButton setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    [self.instrumentButton useWhiteLabel: YES];
+    self.instrumentButton.buttonTintColor = [UIColor colorWithRed:54.0/255.0 green:88.0/255.0 blue:151.0/255.0 alpha:1];
+    [self.instrumentButton setShadow:[UIColor lightGrayColor] opacity:0.8 offset:CGSizeMake(0, 1) blurRadius: 4];
+   // [self.instrumentButton setGradientType:kUIGlossyButtonGradientTypeLinearSmoothBrightToNormal];
+    
+    self.testbutton.alpha=0.0;
+    self.stoptestbutton.alpha=0.0;
+
+    
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text;
+{
+    [super textView:textView shouldChangeTextInRange:range replacementText:text];
+
+    if ( [text isEqualToString:@" "] ) {
+        //Do whatever you want
+        self.buttonIndex--;
+        if (self.buttonIndex<0) {
+            self.buttonIndex=self.numparts-1;
+        }
+        NSLog(@"Return!!");
+    }
+    
+    if([text isEqualToString:@"\n"])
+    {
+        NSLog(@"Space");
+        self.buttonIndex++;
+        if (self.buttonIndex>=self.numparts) {
+            self.buttonIndex=0;
+        }
+
+    }
+    
+    [self pushButtonForIndex:self.buttonIndex];
+    return YES;
+}
+
+-(void)pushButtonForIndex:(int)index
+{
+
+    switch (index) {
+        case 0:
+            [self button1hit:nil];
+            [self highlightButton:self.button1];
+            break;
+        case 1:
+            [self button2hit:nil];
+            [self highlightButton:self.button2];
+
+
+            break;
+        case 2:
+            [self button3hit:nil];
+            [self highlightButton:self.button3];
+
+            break;
+        case 3:
+            [self button4hit:nil];
+            [self highlightButton:self.button4];
+
+            break;
+        case 4:
+            [self button5hit:nil];
+            [self highlightButton:self.button5];
+
+            break;
+        case 5:
+            [self button6hit:nil];
+            [self highlightButton:self.button6];
+            
+            break;
+        case 6:
+            [self button7hit:nil];
+            [self highlightButton:self.button7];
+            
+            break;
+        case 7:
+            [self button8hit:nil];
+            [self highlightButton:self.button8];
+            
+            break;
+            
+        default:
+            break;
+    }
+}
+-(void)highlightButton:(UIButton*)button
+{
+    [[GCDQueue mainQueue]queueBlock:^{
+        for (UIButton  *abutton in self.buttonArray) {
+            
+            if (abutton == button) {
+                abutton.titleLabel.textColor=[UIColor orangeColor];
+            }else
+            {
+                abutton.titleLabel.textColor=[UIColor whiteColor];
+                
+            }
+        }
+    }];
+    
+}
+#pragma mark --
+#pragma mark MIDI
+
+-(void)midiNoteBegan:(MidiController*)midi
+{
+   
+   /* NSTimeInterval  now=[[NSDate date]timeIntervalSince1970];
+    
+    if ((now-self.lasttime)<1)
+    {
+        self.lasttime=[[NSDate date]timeIntervalSince1970];
+        return;
+    }
+    
+    self.lasttime=[[NSDate date]timeIntervalSince1970];
+    
+    [super sendLogToOutput:[NSString stringWithFormat:@"note == %i",midi.currentdirection]];
+    if (midi.currentdirection==midiinhale) {
+        
+        self.buttonIndex++;
+        if (self.buttonIndex>4) {
+            self.buttonIndex=0;
+        }
+        
+    }else if (midi.currentdirection==midiexhale)
+    {
+        self.buttonIndex--;
+        if (self.buttonIndex<0) {
+            self.buttonIndex=4;
+        }
+    }
+    
+    [self pushButtonForIndex:self.buttonIndex];*/
+    
+    self.audioEngine.delegate=self;
+    
+
+}
+-(void)midiNoteStopped:(MidiController*)midi
+{
+   /* [super midiNoteStopped:midi];
+    if (!self.tableViewController) {
+        self.tableViewController = [[SongModeTableViewController alloc] initWithStyle:UITableViewStylePlain];
+        
+        self.tableViewController.delegate=self;
+        
+    }
+    
+    [self.tableViewController toggle];*/
+    [self.audioEngine stopBreath];
+    
+
+
+}
+-(IBAction)test2:(id)sender
+{
+    [self midiNoteStopped:nil];
+}
+-(IBAction)test:(id)sender;
+{
+    self.audioEngine.delegate=self;
+
+    [self.audioEngine beginBreath];
+
+}
+-(void)midiNoteContinuing:(MidiController*)midi
+{
+    NSTimeInterval  now=[[NSDate date]timeIntervalSince1970];
+    
+    if ((now-self.lasttime)<1)
+    {
+        self.lasttime=[[NSDate date]timeIntervalSince1970];
+        return;
+    }
+    
+    self.lasttime=[[NSDate date]timeIntervalSince1970];
+    
+    float setting=[[[NSUserDefaults standardUserDefaults]valueForKey:@"threshold"]floatValue];
+    
+   // [super sendLogToOutput:[NSString stringWithFormat:@"settting == %f \n",setting]];
+   // [super sendLogToOutput:[NSString stringWithFormat:@"velocity == %f \n",midi.velocity]];
+    if (midi.velocity<setting) {
+        
+        [self.audioEngine stopBreath];
+
+        return;
+        
+        
+    }
+    [super midiNoteBegan:midi];
+    
+    if (midi.currentdirection==midiexhale) {
+        
+        
+        if (self.useInhale) {
+            [self.audioEngine beginBreath];
+            
+        }
+        
+    }else if (midi.currentdirection==midiinhale)
+    {
+        if (!self.useInhale) {
+            [self.audioEngine beginBreath];
+            
+        }
+    }
+
+}
+-(void)sendLogToOutput:(NSString*)log
+{
+    [super sendLogToOutput:log];
+}
+@end
+

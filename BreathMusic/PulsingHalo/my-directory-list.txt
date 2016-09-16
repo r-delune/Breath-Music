@@ -1,0 +1,259 @@
+The file MultiplePulsingHaloLayer.h contains:
+//
+//  MultiplePulsingHaloLayer.h
+//  PulsingHaloDemo
+//
+//  Created by ShannonChou on 14-7-7.
+//  Copyright (c) 2014年 jiecao.fm. All rights reserved.
+//
+
+#import <QuartzCore/QuartzCore.h>
+
+@interface MultiplePulsingHaloLayer : CALayer
+
+@property (nonatomic, assign) CGFloat radius;                   // default: 60pt
+@property (nonatomic, assign) CGColorRef haloLayerColor;        // color of halo layers
+
+/* properties below should be set before calling "buildSublayers" */
+@property (nonatomic, assign) CGFloat fromValueForRadius;       // default: 0.0
+@property (nonatomic, assign) CGFloat fromValueForAlpha;        // default: 0.45
+@property (nonatomic, assign) CGFloat keyTimeForHalfOpacity;    // default: 0.2 (range: 0 < keyTime < 1)
+@property (nonatomic, assign) NSTimeInterval animationDuration; // default: 3s
+@property (nonatomic, assign) NSTimeInterval pulseInterval;     // default: 0s
+@property (nonatomic, assign) NSTimeInterval startInterval;     // if there are two more halo layer, this value presents the interval between their first start time, default: 1s
+@property (nonatomic, assign) CGFloat animationRepeatCount;     // default: INFINITY
+@property (nonatomic, assign) int haloLayerNumber;              // default: 3
+@property (nonatomic, assign) BOOL useTimingFunction;           // default: YES should use timingFunction for animation
+
+
+
+- (id)initWithHaloLayerNum:(int)num andStartInterval:(NSTimeInterval)interval;
+
+/**
+ Some properties must be set before calling this method. Like "haloLayerNumber" "startInterval" "animationDuration" and so on
+ except "radius" "haloLayerColor" "backgroundColor". If you want to change some properties like "haloLayerNumber" when the
+ animation is running, you have to create a new instance.
+ */
+- (void)buildSublayers;
+
+@end
+
+The file MultiplePulsingHaloLayer.m contains:
+//
+//  MultiplePulsingHaloLayer.m
+//  PulsingHaloDemo
+//
+//  Created by ShannonChou on 14-7-7.
+//  Copyright (c) 2014年 jiecao.fm. All rights reserved.
+//
+
+#import "MultiplePulsingHaloLayer.h"
+#import "PulsingHaloLayer.h"
+
+@implementation MultiplePulsingHaloLayer
+
+- (id)init {
+    return [self initWithHaloLayerNum:3 andStartInterval:1];
+}
+
+- (id)initWithHaloLayerNum:(int)num andStartInterval:(NSTimeInterval)interval {
+    if (self = [super init]) {
+        self.haloLayerNumber = num;
+        self.startInterval = interval;
+        // default
+        _fromValueForRadius = 0.0;
+        _fromValueForAlpha = 0.45;
+        _keyTimeForHalfOpacity = 0.2;
+        _animationDuration = 3;
+        _pulseInterval = 0;
+        _animationRepeatCount = INFINITY;
+        _radius = 60;
+        _useTimingFunction = YES;
+        self.backgroundColor = [[UIColor clearColor] CGColor];
+    }
+    return self;
+}
+
+- (void)setHaloLayerColor:(CGColorRef)backgroundColor {
+    _haloLayerColor = CGColorRetain(backgroundColor);
+    for (PulsingHaloLayer *layer in self.sublayers) {
+        layer.backgroundColor = backgroundColor;
+    }
+}
+
+- (void)setRadius:(CGFloat)radius {
+    _radius = radius;
+    
+    CGPoint tempPos = self.position;
+    
+    CGFloat diameter = self.radius * 2;
+    
+    self.bounds = CGRectMake(0, 0, diameter, diameter);
+    self.cornerRadius = self.radius;
+    self.position = tempPos;
+    
+    //ajust sublayer
+    for (PulsingHaloLayer *layer in self.sublayers) {
+        layer.radius = radius;
+        layer.position = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
+    }
+}
+
+- (void)buildSublayers {
+    for (int i = 0; i < self.haloLayerNumber; i++) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.startInterval* i * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            PulsingHaloLayer *layer = [PulsingHaloLayer layer];
+            layer.animationDuration = self.animationDuration;
+            layer.repeatCount = self.animationRepeatCount;
+            layer.position = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
+            layer.radius = self.radius;
+            layer.fromValueForAlpha = self.fromValueForAlpha;
+            layer.fromValueForRadius = self.fromValueForRadius;
+            layer.keyTimeForHalfOpacity = self.keyTimeForHalfOpacity;
+            layer.pulseInterval = self.pulseInterval;
+            layer.backgroundColor = self.haloLayerColor;
+            layer.useTimingFunction = self.useTimingFunction;
+            [self addSublayer:layer];
+        });
+    }
+    NSLog(@"sub count:%i", self.sublayers.count);
+}
+
+- (void)dealloc {
+    CGColorRelease(_haloLayerColor);
+}
+
+@end
+
+The file PulsingHaloLayer.h contains:
+//
+//  PulsingHaloLayer.h
+//  https://github.com/shu223/PulsingHalo
+//
+//  Created by shuichi on 12/5/13.
+//  Copyright (c) 2013 Shuichi Tsutsumi. All rights reserved.
+//
+//  Inspired by https://github.com/samvermette/SVPulsingAnnotationView
+
+
+#import <QuartzCore/QuartzCore.h>
+
+
+@interface PulsingHaloLayer : CALayer
+
+@property (nonatomic, assign) CGFloat radius;                   // default: 60pt
+@property (nonatomic, assign) CGFloat fromValueForRadius;       // default: 0.0
+@property (nonatomic, assign) CGFloat fromValueForAlpha;        // default: 0.45
+@property (nonatomic, assign) CGFloat keyTimeForHalfOpacity;    // default: 0.2 (range: 0 < keyTime < 1)
+@property (nonatomic, assign) NSTimeInterval animationDuration; // default: 3s
+@property (nonatomic, assign) NSTimeInterval pulseInterval;     // default: 0s
+@property (nonatomic, assign) float repeatCount;                // default: INFINITY
+@property (nonatomic, assign) BOOL useTimingFunction;           // default: YES should use timingFunction for animation
+
+- (id)initWithRepeatCount:(float)repeatCount;
+
+@end
+
+The file PulsingHaloLayer.m contains:
+//
+//  PulsingHaloLayer.m
+//  https://github.com/shu223/PulsingHalo
+//
+//  Created by shuichi on 12/5/13.
+//  Copyright (c) 2013 Shuichi Tsutsumi. All rights reserved.
+//
+//  Inspired by https://github.com/samvermette/SVPulsingAnnotationView
+
+
+#import "PulsingHaloLayer.h"
+
+
+@interface PulsingHaloLayer ()
+@property (nonatomic, strong) CAAnimationGroup *animationGroup;
+@end
+
+
+@implementation PulsingHaloLayer
+
+- (id)initWithRepeatCount:(float) repeatCount
+{
+    self = [super init];
+    if (self) {
+        self.contentsScale = [UIScreen mainScreen].scale;
+        self.opacity = 0;
+        
+        // default
+        self.radius = 60;
+        self.fromValueForRadius = 0.0;
+        self.fromValueForAlpha = 0.45;
+        self.keyTimeForHalfOpacity = 0.2;
+        self.animationDuration = 3;
+        self.pulseInterval = 0;
+        self.repeatCount = repeatCount;
+        self.backgroundColor = [[UIColor colorWithRed:1.000 green:0.0 blue:0 alpha:1] CGColor];
+        self.useTimingFunction = YES;
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            
+            [self setupAnimationGroup];
+            
+            if(self.pulseInterval != INFINITY) {
+                
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    
+                    [self addAnimation:self.animationGroup forKey:@"pulse"];
+                });
+            }
+        });
+    }
+    return self;
+    
+}
+
+- (id)init {
+    return [self initWithRepeatCount:INFINITY];
+}
+
+- (void)setRadius:(CGFloat)radius {
+    
+    _radius = radius;
+    
+    CGPoint tempPos = self.position;
+    
+    CGFloat diameter = self.radius * 2;
+    
+    self.bounds = CGRectMake(0, 0, diameter, diameter);
+    self.cornerRadius = self.radius;
+    self.position = tempPos;
+}
+
+- (void)setupAnimationGroup {
+    
+    
+    self.animationGroup = [CAAnimationGroup animation];
+    self.animationGroup.duration = self.animationDuration + self.pulseInterval;
+    self.animationGroup.repeatCount = self.repeatCount;
+    self.animationGroup.removedOnCompletion = NO;
+    if (self.useTimingFunction) {
+        CAMediaTimingFunction *defaultCurve = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault];
+        self.animationGroup.timingFunction = defaultCurve;
+    }
+    
+    CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.xy"];
+    scaleAnimation.fromValue = @(self.fromValueForRadius);
+    scaleAnimation.toValue = @1.0;
+    scaleAnimation.duration = self.animationDuration;
+    
+    CAKeyframeAnimation *opacityAnimation = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
+    opacityAnimation.duration = self.animationDuration;
+    opacityAnimation.values = @[@(self.fromValueForAlpha), @0.45, @0];
+    opacityAnimation.keyTimes = @[@0, @(self.keyTimeForHalfOpacity), @1];
+    opacityAnimation.removedOnCompletion = NO;
+    
+    NSArray *animations = @[scaleAnimation, opacityAnimation];
+    
+    self.animationGroup.animations = animations;
+}
+
+@end
+
