@@ -486,6 +486,7 @@
 		0BD351C019F6B72400D54511 /* spring_part6.mid in Resources */ = {isa = PBXBuildFile; fileRef = 0BD351BF19F6B72400D54511 /* spring_part6.mid */; };
 		0BF57EAD1BD78C5100912ADB /* Bluetooth-CONNECTED.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BF57EAB1BD78C5100912ADB /* Bluetooth-CONNECTED.png */; };
 		0BF57EAE1BD78C5100912ADB /* Bluetooth-DISCONNECTED.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BF57EAC1BD78C5100912ADB /* Bluetooth-DISCONNECTED.png */; };
+		711D358D215CE43000466892 /* BreathMusicAppIcon1024x1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 711D358C215CE43000466892 /* BreathMusicAppIcon1024x1024.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1036,6 +1037,7 @@
 		0BD351BF19F6B72400D54511 /* spring_part6.mid */ = {isa = PBXFileReference; lastKnownFileType = audio.midi; path = spring_part6.mid; sourceTree = "<group>"; };
 		0BF57EAB1BD78C5100912ADB /* Bluetooth-CONNECTED.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Bluetooth-CONNECTED.png"; sourceTree = "<group>"; };
 		0BF57EAC1BD78C5100912ADB /* Bluetooth-DISCONNECTED.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Bluetooth-DISCONNECTED.png"; sourceTree = "<group>"; };
+		711D358C215CE43000466892 /* BreathMusicAppIcon1024x1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BreathMusicAppIcon1024x1024.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1729,6 +1731,7 @@
 		0BC99CF119DEF5A2002D7B0B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				711D358C215CE43000466892 /* BreathMusicAppIcon1024x1024.png */,
 				0BC99CF219DEF5A2002D7B0B /* BreathMusicAppIcon100x100.png */,
 				0BC99CF319DEF5A2002D7B0B /* BreathMusicAppIcon114x114.png */,
 				0BC99CF419DEF5A2002D7B0B /* BreathMusicAppIcon120x120.png */,
@@ -2266,6 +2269,7 @@
 				0BA5BB7C19ED10AD0081BAF9 /* auld-lang-syne_part7.mid in Resources */,
 				0BA5BB8019ED10AD0081BAF9 /* berend-botje_part3.mid in Resources */,
 				0BA5BC9D19ED10AD0081BAF9 /* tico-tico_part6.mid in Resources */,
+				711D358D215CE43000466892 /* BreathMusicAppIcon1024x1024.png in Resources */,
 				0BA5BC9619ED10AD0081BAF9 /* three-blind-mice_part7.mid in Resources */,
 				0BA5BCB719ED10AD0081BAF9 /* wheels_part3.mid in Resources */,
 				0BA5BC7E19ED10AD0081BAF9 /* symphony-no5_part2.mid in Resources */,
@@ -2512,6 +2516,7 @@
 		0B03F9F719B9EF9100F27444 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -2540,6 +2545,7 @@
 		0B03F9F819B9EF9100F27444 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
