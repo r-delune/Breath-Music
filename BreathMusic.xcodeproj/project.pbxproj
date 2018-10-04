@@ -2534,6 +2534,7 @@
 					"$(PROJECT_DIR)/BreathMusic/btlemanager/lib",
 					"$(PROJECT_DIR)/BreathMusic/btlemanager/libMelodySmart",
 				);
+				MACH_O_TYPE = mh_execute;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.audiorhoon.breathmusic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2557,12 +2558,14 @@
 				GCC_PREFIX_HEADER = "BreathMusic/BreathMusic-Prefix.pch";
 				INFOPLIST_FILE = "BreathMusic/BreathMusic-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_MAP_FILE_PATH = "";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/BreathMusic/btlemanager/lib",
 					"$(PROJECT_DIR)/BreathMusic/btlemanager/libMelodySmart",
 				);
+				MACH_O_TYPE = mh_execute;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.audiorhoon.breathmusic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
