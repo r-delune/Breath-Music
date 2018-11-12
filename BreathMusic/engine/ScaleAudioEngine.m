@@ -29,6 +29,9 @@
 @property(readwrite)int currentOctave;
 @property(nonatomic,strong)NSString *currentInstrument;
 @property(readwrite)UInt8 currentPresetNumber;
+
+@property int currentPrefix;
+
 @property UInt32  velocity;
 @property(nonatomic,strong)NSTimer  *midiStopTimer;
 @end
@@ -79,11 +82,15 @@
     
     s = MIDIOutputPortCreate(client, (CFStringRef)@"how ya Output Port", &outputPort);
 
-    self.currentPresetNumber=7;
+    //BD
+    //self.currentPresetNumber=7;
     self.currentOctave=3;
     [self createAUGraph];
     [self startGraph];
     [self setupSampler:self.currentPresetNumber];
+    //[self setupSampler:self.currentPrefix];
+    NSLog(@"Setting up sampler with %hhu", self.currentPresetNumber);
+    NSLog(@"Setting up sampler prefix with %d", self.currentPrefix);
 }
 #pragma mark - Audio setup
 - (BOOL) createAUGraph
@@ -171,7 +178,7 @@
    
     bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
                                                   pathForResource:@"yamaha" ofType:@"sf2"]];
-    NSLog(@"set pn %d", pn);
+    NSLog(@"BD SETTING PN set pn %d", pn);
     
     AUSamplerBankPresetData bpdata;
     bpdata.bankURL  = (__bridge CFURLRef) bankURL;
@@ -199,13 +206,17 @@
 }
 -(void)setInstrument:(int)instrument
 {
+    NSLog(@"SET self.currentPresetNumber/ INSTRUMENT set pn %d", instrument);
+    
     instrument=instrument-1;
     self.currentPresetNumber=instrument;
+    
+    self.currentPrefix=instrument;
     
     NSURL *bankURL;
      bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
                                                   pathForResource:@"yamaha" ofType:@"sf2"]];
-    NSLog(@"set pn %d", instrument);
+    
     
     // fill out a bank preset data structure
     AUSamplerBankPresetData bpdata;

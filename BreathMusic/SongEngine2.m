@@ -36,6 +36,8 @@
 @property(nonatomic,strong)NSString *currentInstrument;
 @property(readwrite)UInt8 currentPresetNumber;
 
+@property int currentPrefix;
+
 @property int numparts;
 @property(nonatomic,strong)NSString  *filename;
 

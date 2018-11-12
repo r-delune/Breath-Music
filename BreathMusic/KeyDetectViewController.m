@@ -215,7 +215,7 @@
 {
     
     
-    NSLog(@"midiNoteBegan");
+    //NSLog(@"midiNoteBegan");
 
     
     BOOL inverse=NO;

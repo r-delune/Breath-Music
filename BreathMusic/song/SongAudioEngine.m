@@ -44,15 +44,19 @@
 @property(nonatomic,strong)NSMutableArray  *instruments;
 
 @property int currentBeat;
+@property int presetIndex;
 
 @property(nonatomic,strong)NSString *currentInstrument;
 @property(readwrite)UInt8 currentPresetNumber;
+
+@property int currentPrefix;
 
 @property int numparts;
 @property(nonatomic,strong)NSString  *filename;
 
 
 @property int lastIndex;
+@property int currentSong;
 
 @property MusicTimeStamp fullLength;
 @property MusicTimeStamp position;
@@ -273,22 +277,36 @@ bool _allowNextNote;
 - (void) setupSampler:(UInt8) pn samplerUnit:(AudioUnit)unit track:(int)track;
 {
     // propagates stream formats across the connections
+    
+    NSLog(@"SETTING UP SAMPLER");
     Boolean outIsInitialized;
     CheckError(AUGraphIsInitialized(self.processingGraph,
                                     &outIsInitialized), "AUGraphIsInitialized");
     if(!outIsInitialized) {
         return;
     }
+   
     if(pn < 0 || pn > 127) {
         return;
     }
-    NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
-    /* bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
-     pathForResource:@"gs_instruments" ofType:@"dls"]];*/
-    NSLog(@"set pn %i", pn);
-    if (pn==0) {
-        pn=73;
-    }
+    
+
+        NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
+        /* bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
+         pathForResource:@"gs_instruments" ofType:@"dls"]];*/
+    
+    pn = self.currentPresetNumber;
+    //pn = self.currentPrefix;
+    
+    
+    NSLog(@"SONG AUDIO ENGINE setupSampler PN set pn/ self.currentPresetNumber %@", [NSString stringWithFormat:@"%d",self.currentPresetNumber]);
+    NSLog(@"SONG AUDIO ENGINE setupSampler PN set pn/ currentPrefix %@", [NSString stringWithFormat:@"%d",self.currentPrefix]);
+    
+    
+        if (pn==0) {
+            pn=73;
+        }
+    
     
     // fill out a bank preset data structure
     AUSamplerBankPresetData bpdata;
@@ -377,7 +395,7 @@ bool _allowNextNote;
     
     for(int i = 0; i < trackCount; i++)
     {
-        
+        NSLog(@"LAODING MIDI FILE pn ");
         MusicTrack track = NULL;
         MusicTimeStamp trackLen = 0;
         UInt32 trackLenLen = sizeof(trackLen);
@@ -543,6 +561,7 @@ bool _allowNextNote;
         return;
     }
     if (!self.musicPlayer) {
+        
         [self loadMIDIFile];
         
     }
@@ -613,9 +632,17 @@ bool _allowNextNote;
 }
 -(void)setInstrument:(int)instrument
 {
-     NSLog(@"Palying ISTRU %d", _lastIndex);
+    ///NSLog(@"Palying ISTRU %d", _lastIndex);
+    
+     NSLog(@"BD setInstrument set cuyrrent song to %i", instrument);
     
     self.currentPresetNumber=instrument;
+    
+    self.currentPrefix=instrument;
+    
+    NSLog(@"BD setInstrument set cuyrrent song to %i", self.currentPrefix);
+    
+    NSLog(@"BD setInstrument set cuyrrent song to %i", self.currentPresetNumber);
     
     NSURL *bankURL;
     /*
@@ -624,7 +651,8 @@ bool _allowNextNote;
      */
     bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
                                                   pathForResource:@"yamaha" ofType:@"sf2"]];
-    NSLog(@"set pn %d", instrument);
+    
+   
     
     // fill out a bank preset data structure
     AUSamplerBankPresetData bpdata;

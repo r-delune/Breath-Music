@@ -106,8 +106,10 @@
         [self addCircle];
         [self sendLogToOutput:song];
         self.bpmLabel.text=[NSString stringWithFormat:@"BPM %i",[self.audioengine getTheTempo]];
-
+        NSLog(@"HERE");
         [self.popover dismissPopoverAnimated:YES];
+        
+
     }];
     
 

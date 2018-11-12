@@ -275,7 +275,7 @@
     NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
     /* bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
      pathForResource:@"gs_instruments" ofType:@"dls"]];*/
-    NSLog(@"set pn %d", pn);
+    NSLog(@"SETUP SAMPLER set pn %d", pn);
     
     // fill out a bank preset data structure
     AUSamplerBankPresetData bpdata;

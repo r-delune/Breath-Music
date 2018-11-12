@@ -207,8 +207,8 @@ int _currentIndex;
     [self.songSelectButton setTitle:styleName forState:UIControlStateNormal];
 
     
-    
-        
+        //self.instrumentButton.titleLabel.text = @"Instrument : Flute";
+        [self.instrumentButton setTitle: @"Instrument : Flute" forState:UIControlStateNormal];
 
        // [self pushButtonForIndex:0];
        // [self.audioEngine stitchMidiData];
@@ -227,10 +227,10 @@ int _currentIndex;
     
     
     [self.audioEngine playMIDIFile];
-    if ([self.instrumentButton.titleLabel.text isEqualToString:@"Instrument : Flute"]) {
-        [self.audioEngine setInstrument:73 ];
+    //if ([self.instrumentButton.titleLabel.text isEqualToString:@"Instrument : Flute"]) {
+    //    [self.audioEngine setInstrument:73 ];
         
-    }
+    //}
 }
 -(IBAction)songButtonHit:(id)sender
 {
