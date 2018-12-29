@@ -123,10 +123,8 @@ NSLog(@"%s",__func__);
         [self.midiplayers addObject:player];
         
     }
-
-
-
 }
+
 -(void)assessPlaybackPosition
 {
     

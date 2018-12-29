@@ -122,6 +122,9 @@ int _currentIndex;
     [_popover dismissPopoverAnimated:YES];
     
     int presetNumber=[[instrument valueForKey:@"InstrumentNumber"]intValue];
+    
+    NSLog(@"SONG VIEW Instrument selected %i", presetNumber);
+    
     [self.audioEngine setInstrument:presetNumber ];
     
     

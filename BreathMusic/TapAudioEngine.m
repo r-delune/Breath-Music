@@ -275,24 +275,24 @@
     NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
     /* bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
      pathForResource:@"gs_instruments" ofType:@"dls"]];*/
-    NSLog(@"SETUP SAMPLER set pn %d", pn);
+    NSLog(@"TAO AUDIO SETUP SAMPLER set pn %d", pn);
     
     // fill out a bank preset data structure
     AUSamplerBankPresetData bpdata;
-    if (track==9) {
-        bpdata.bankURL  = (__bridge CFURLRef) presetURL;
-        bpdata.bankMSB  = kAUSampler_DefaultPercussionBankMSB;
-        bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
-        bpdata.presetID = (UInt8) pn;
+   // if (track==9) {
+   //     bpdata.bankURL  = (__bridge CFURLRef) presetURL;
+   //     bpdata.bankMSB  = kAUSampler_DefaultPercussionBankMSB;
+   //     bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
+   //     bpdata.presetID = (UInt8) pn;
         
-    }else
-    {
+   // }else
+   // {
         bpdata.bankURL  = (__bridge CFURLRef) presetURL;
         bpdata.bankMSB  = kAUSampler_DefaultMelodicBankMSB;
         bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
         bpdata.presetID = (UInt8) pn;
         
-    }
+   // }
     
     
     // set the kAUSamplerProperty_LoadPresetFromBank property

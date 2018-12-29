@@ -168,7 +168,7 @@
     int presetNumber=[[instrument valueForKey:@"InstrumentNumber"]intValue];
     [self.engine setInstrument:presetNumber ];
     
-    NSLog(@"BD Selected song %i",presetNumber);
+    NSLog(@"KEYVIEW CONTROLLER Selected song %i",presetNumber);
 }
 -(void)keySelected:(NSString *)key
 {

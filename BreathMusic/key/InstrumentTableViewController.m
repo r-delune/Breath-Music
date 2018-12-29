@@ -30,6 +30,8 @@
     [super viewDidLoad];
     NSString* plistPath = [[NSBundle mainBundle] pathForResource:@"MIDIInstrumentList" ofType:@"plist"];
     self.instruments = [NSArray arrayWithContentsOfFile:plistPath];
+    
+   // NSLog(@"Instrument view loaded %@", self.instruments);
 
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -66,6 +68,8 @@
         self.arrayIndex=0;
     }
     
+    NSLog(@"TOGGLE? %@", self.instruments[self.arrayIndex]);
+    
     return self.instruments[self.arrayIndex];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -76,6 +80,9 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     NSDictionary  *dict=self.instruments[indexPath.row];
+    
+    //NSLog(@"Instruments array (INSTRUMENTS TABLE) %@", self.instruments);
+    
     cell.textLabel.text=[dict valueForKey:@"InstrumentName"];    // Configure the cell...
     
     return cell;

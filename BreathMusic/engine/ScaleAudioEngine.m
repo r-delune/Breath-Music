@@ -206,12 +206,15 @@
 }
 -(void)setInstrument:(int)instrument
 {
-    NSLog(@"SET self.currentPresetNumber/ INSTRUMENT set pn %d", instrument);
     
     instrument=instrument-1;
     self.currentPresetNumber=instrument;
     
     self.currentPrefix=instrument;
+    
+    NSLog(@"SET INSTRUMENT SCALE GAME set self.currentPrefix %d", self.currentPrefix);
+    
+    NSLog(@"SET INSTRUMENT SCALE GAME set self.currentPresetNumber %d", self.currentPresetNumber);
     
     NSURL *bankURL;
      bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
@@ -282,6 +285,7 @@
 //hava
 -(UInt32)noteForString2:(NSString*)noteString
 {
+
     UInt32  offset=0;
     
     if ([noteString isEqualToString:@"Do"]) {
@@ -328,9 +332,10 @@
 }
 -(UInt32)rootForKey:(NSString*)key
 {
+    
+     NSLog(@"rootForKey %@", key);
+    
     UInt32  offset=12;
-    
-    
     
     if ([key isEqualToString:@"C Major"]) {
         offset=0;
@@ -373,7 +378,7 @@
     
     int index;
     
-    NSArray  *currentscaleNotes=[[self.currentScale valueForKey:@"ScaleNotes"]componentsSeparatedByString:@","];
+    NSArray *currentscaleNotes=[[self.currentScale valueForKey:@"ScaleNotes"] componentsSeparatedByString:@","];
     
     if ([noteString isEqualToString:@"Do"]) {
        // offset=0;
@@ -426,9 +431,10 @@
     
     return result;
 }
+
 -(void)playNote:(NSString*)note
 {
-    NSLog(@"play sampler note");
+    NSLog(@"play sampler note %@", note);
     
     [self stopTimer];
     UInt32 midiStatus;

@@ -76,10 +76,8 @@ bool _allowNextNote;
 }
 
 -(void)setMidiStyle:(NSDictionary*)style 
-{
-   
+{   
     self.tempo=[[style valueForKey:@"SongTempo"]intValue];
-
     self.numparts=[[style valueForKey:@"SongPartCount"]intValue];
     self.filename=[style valueForKey:@"SongFileName"];
     
@@ -278,7 +276,7 @@ bool _allowNextNote;
 {
     // propagates stream formats across the connections
     
-    NSLog(@"SETTING UP SAMPLER");
+    NSLog(@"SONG MODE - SETTING UP SAMPLER");
     Boolean outIsInitialized;
     CheckError(AUGraphIsInitialized(self.processingGraph,
                                     &outIsInitialized), "AUGraphIsInitialized");
@@ -290,12 +288,14 @@ bool _allowNextNote;
         return;
     }
     
-
+     pn=pn-1;
+    
+    NSLog(@"SONG AUDIO SETUP SAMPLER set pn %d WITH TRACK %@", pn, track);
         NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
         /* bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
          pathForResource:@"gs_instruments" ofType:@"dls"]];*/
     
-    pn = self.currentPresetNumber;
+    //pn = self.currentPresetNumber;
     //pn = self.currentPrefix;
     
     
@@ -310,20 +310,20 @@ bool _allowNextNote;
     
     // fill out a bank preset data structure
     AUSamplerBankPresetData bpdata;
-    if (track==9) {
-        bpdata.bankURL  = (__bridge CFURLRef) presetURL;
-        bpdata.bankMSB  = kAUSampler_DefaultPercussionBankMSB;
-        bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
-        bpdata.presetID = (UInt8) pn;
-        
-    }else
-    {
+   // if (track==9) {
+    //    bpdata.bankURL  = (__bridge CFURLRef) presetURL;/
+     //   bpdata.bankMSB  = kAUSampler_DefaultPercussionBankMSB;//
+    //    bpdata.bankLSB  = kAUSampler_DefaultBankLSB;///
+    //////    bpdata.presetID = (UInt8) pn;
+   ///
+   /// }else
+   // {
         bpdata.bankURL  = (__bridge CFURLRef) presetURL;
         bpdata.bankMSB  = kAUSampler_DefaultMelodicBankMSB;
         bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
         bpdata.presetID = (UInt8) pn;
         
-    }
+    //}
     
     
     // set the kAUSamplerProperty_LoadPresetFromBank property
@@ -522,10 +522,9 @@ bool _allowNextNote;
         return;
     }
     
-    
     MusicSequence msequence=sequence.sequence;
     CheckError(MusicSequenceGetTrackCount(msequence, &trackCount), "MusicSequenceGetTrackCount");
-     NSLog(@"Number of tracks: %lu", trackCount);
+    NSLog(@"Number of tracks: %u", (unsigned int)trackCount);
     
 
     for(int i = 0; i < trackCount; i++)
@@ -580,7 +579,7 @@ bool _allowNextNote;
 
 -(void) cleanup
 {
-     NSLog(@"cleanup %@", _lastIndex);
+    //8i NSLog(@"cleanup %@", _lastIndex);
     
     MusicPlayerStop(self.musicPlayer);
     
@@ -632,27 +631,14 @@ bool _allowNextNote;
 }
 -(void)setInstrument:(int)instrument
 {
-    ///NSLog(@"Palying ISTRU %d", _lastIndex);
-    
-     NSLog(@"BD setInstrument set cuyrrent song to %i", instrument);
-    
+    instrument=instrument-1;
     self.currentPresetNumber=instrument;
-    
     self.currentPrefix=instrument;
-    
-    NSLog(@"BD setInstrument set cuyrrent song to %i", self.currentPrefix);
-    
-    NSLog(@"BD setInstrument set cuyrrent song to %i", self.currentPresetNumber);
-    
+    NSLog(@"SET INSTRUMENT SCALE GAME set self.currentPrefix %d", self.currentPrefix);
+    NSLog(@"SET INSTRUMENT SCALE GAME set self.currentPresetNumber %d", self.currentPresetNumber);
     NSURL *bankURL;
-    /*
-     bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
-     pathForResource:@"FluidR3_GM" ofType:@"sf2"]];
-     */
     bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
                                                   pathForResource:@"yamaha" ofType:@"sf2"]];
-    
-   
     
     // fill out a bank preset data structure
     AUSamplerBankPresetData bpdata;
@@ -661,20 +647,43 @@ bool _allowNextNote;
     bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
     bpdata.presetID = (UInt8) instrument;
     
+    ///NSLog(@"Palying ISTRU %d", _lastIndex);
+    NSLog(@"SONG ENGINE setInstrument set cuyrrent prefix to %i", self.currentPrefix);
+    NSLog(@"SONG ENGINE setInstrument set cuyrrent song to %i", self.currentPresetNumber);
+
+    /*
+     bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
+     pathForResource:@"FluidR3_GM" ofType:@"sf2"]];
+     */
+
+    // fill out a bank preset data structure
+    
       for(int i=0; i<[self.instruments count]; i++) {
         // Extract the sampler note from the NSValue into the samplerNode variable
+        NSLog(@"SONG ENGINE %i - %@", i, self.instruments[i]);
         
-        Instrument *instrument=self.instruments[i];
-             CheckError(AudioUnitSetProperty(instrument.instrumentUnit,
+        Instrument *instrument = self.instruments[i];
+          
+        //NSLog(@"SONG ENGINE %i - %@", i, instrument.instrumentUnit);
+          NSLog(@"SONG ENGINE %i - %d", i, (int)instrument.instrumentNode);
+          
+        CheckError(AudioUnitSetProperty(instrument.instrumentUnit,
                                         kAUSamplerProperty_LoadPresetFromBank,
                                         kAudioUnitScope_Global,
                                         0,
                                         &bpdata,
                                         sizeof(bpdata)), "kAUSamplerProperty_LoadPresetFromBank");
+          
+        // set the kAUSamplerProperty_LoadPresetFromBank property
+        //CheckError(AudioUnitSetProperty(self.samplerUnit,
+        //                                  kAUSamplerProperty_LoadPresetFromBank,
+        //                                  kAudioUnitScope_Global,
+        //                                  0,
+        //                                  &bpdata,
+        //                                  sizeof(bpdata)), "kAUSamplerProperty_LoadPresetFromBank");
     }
-
-   
 }
+
 -(void)beginBreath
 {
     if (!self.musicPlayer) {
@@ -694,7 +703,6 @@ bool _allowNextNote;
         MusicPlayerSetTime(self.musicPlayer, self.position);
         MusicPlayerPreroll(self.musicPlayer);
         CheckError(MusicPlayerStart(self.musicPlayer), "MusicPlayerStart");
-    
     }
 }
 
@@ -726,7 +734,7 @@ bool _allowNextNote;
             
             NSLog(@"[self.stitchTimes count] %lu", (unsigned long)[self.stitchTimes count]);
             NSLog(@"pos %f", pos);
-             NSLog(@"[value floatValue] %f", [value floatValue]);
+            NSLog(@"[value floatValue] %f", [value floatValue]);
             NSLog(@"OTHER - playing next note");
             
             
@@ -827,8 +835,7 @@ bool _allowNextNote;
         NSLog(@"sTOPPING");
         MusicPlayerStop(self.musicPlayer);
     }
-    
-   
+
 }
 
 #pragma mark Send Routines
@@ -845,13 +852,10 @@ void MyMIDINotifyProc2 (const MIDINotification  *message, void *refCon) {
     }
     OSStatus s = MIDIClientCreate((CFStringRef)@"How ya MIDI Client222", nil, (__bridge void *)(self), &virtualMidi);
 
-    
     // Create an endpoint
     void* callbackContext = (__bridge void*) self;
     s = MIDIDestinationCreate(virtualMidi, CFSTR("Virtual Destination"), ReadProc,nil, &virtualEndpoint);
 
-
-    
    // NSString *inName = [NSString stringWithFormat:@"Magical MIDI Destination77"];
    // s = MIDIDestinationCreate(virtualMidi, (__bridge CFStringRef)inName, ReadProc,  (__bridge void *)self, &virtualInTemp);
     
@@ -925,9 +929,9 @@ void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcC
    // UInt8 noteOn[]  = {192, refToSelf.currentPresetNumber , 0 };
    // [refToSelf sendBytes:noteOn size:sizeof(&noteOn)];
     [refToSelf sendPacketList:packetList];
-
-
+    
 }
+
 #pragma mark Send Routines
 - (void) sendBytes:(const UInt8*)bytes size:(UInt32)size
 {
@@ -937,7 +941,6 @@ void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcC
     MIDIPacketList *packetList = (MIDIPacketList*)packetBuffer;
     MIDIPacket     *packet     = MIDIPacketListInit(packetList);
     packet = MIDIPacketListAdd(packetList, sizeof(packetBuffer), packet, 0, size, bytes);
-    
     
     [self sendPacketList:packetList];
 }
