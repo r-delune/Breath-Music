@@ -135,51 +135,45 @@ int _currentIndex;
     [self.audioEngine playIndex:0];
 }
 -(IBAction)button2hit:(id)sender{
-
     [self.audioEngine playIndex:1];
-
 }
-    
-    
-    
+
 -(IBAction)button3hit:(id)sender{
     [self.audioEngine playIndex:2];
-
 }
+
 -(IBAction)button4hit:(id)sender{
     [self.audioEngine playIndex:3];
-
 }
+
 -(IBAction)button5hit:(id)sender{
     [self.audioEngine playIndex:4];
-
 }
+
 -(IBAction)button6hit:(id)sender{
     [self.audioEngine playIndex:5];
-
 }
+
 -(IBAction)button7hit:(id)sender{
     [self.audioEngine playIndex:6];
+}
 
-}
 -(IBAction)button8hit:(id)sender{
-    
     [self.audioEngine playIndex:7];
-    
 }
+
 -(void)reset
 {
     NSLog(@"%s",__func__);
     [self songSelected:self.lastsong];
 }
+
 -(void)songSelected:(NSDictionary *)dict
 {
-    
     NSLog(@"%s",__func__);
     self.buttonIndex=-1;
     self.lastsong=dict;
     [self.popover dismissPopoverAnimated:YES];
-
     [self highlightButton:self.button1];
     
     NSString  *styleName=[dict valueForKey:@"SongDisplayName"];
@@ -223,18 +217,14 @@ int _currentIndex;
     
     self.audioEngine=nil;
     self.audioEngine = [[SongAudioEngine alloc] init];
-    
-    
-    
     [self.audioEngine setMidiStyle:dict];
-    
-    
     [self.audioEngine playMIDIFile];
     //if ([self.instrumentButton.titleLabel.text isEqualToString:@"Instrument : Flute"]) {
     //    [self.audioEngine setInstrument:73 ];
         
     //}
 }
+
 -(IBAction)songButtonHit:(id)sender
 {
     NSLog(@"%s",__func__);
@@ -250,7 +240,6 @@ int _currentIndex;
 -(IBAction)toggleButtonHit:(id)sender
 
 {
-    
     if (self.useInhale) {
         self.useInhale=NO;
         [self.toggleDirectionButton setImage:[UIImage imageNamed:@"SWITCH-Breath-EXHALE"] forState:UIControlStateNormal];
@@ -260,8 +249,8 @@ int _currentIndex;
         self.useInhale=YES;
         [self.toggleDirectionButton setImage:[UIImage imageNamed:@"SWITCH-Breath-INHALE"] forState:UIControlStateNormal];
     }
-
 }
+
 -(IBAction)mainMenu:(id)sender
 {
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -274,6 +263,7 @@ int _currentIndex;
     }
     return self;
 }
+
 -(void)viewWillDisappear:(BOOL)animated
 {
     [[GCDQueue mainQueue]queueBlock:^{
@@ -281,6 +271,7 @@ int _currentIndex;
         [self.audioEngine cleanup];
     }];
 }
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -502,8 +493,6 @@ NSLog(@"%s",__func__);
         return;
     }
     
-
-
     MidiController  *midi=[MidiController new];
     midi.currentdirection=midiinhale;
        [super midiNoteBegan:midi];

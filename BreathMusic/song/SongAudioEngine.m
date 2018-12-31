@@ -82,6 +82,7 @@ bool _allowNextNote;
     self.filename=[style valueForKey:@"SongFileName"];
     
 }
+
 - (id) init
 {
     NSLog(@"initing");
@@ -106,6 +107,7 @@ bool _allowNextNote;
     
     return self;
 }
+
 -(void)createAUGraph
 {
     NSLog(@"stopMidiNote MIDI");
@@ -230,14 +232,12 @@ bool _allowNextNote;
     result = AUGraphConnectNodeInput (_processingGraph, mixerNode, 0, ioNode, 0);
     NSCAssert (result == noErr, @"Unable to interconnect the nodes in the audio processing graph. Error code: %d '%.4s'", (int) result, (const char *)&result);
     
-  //  AUGraphAddRenderNotify(_processingGraph, renderCallback, (__bridge void*) self);
-    
+    //  AUGraphAddRenderNotify(_processingGraph, renderCallback, (__bridge void*) self);
 	CAShow(self.processingGraph);
     
     [self startGraph];
-
-    
 }
+
 - (void) startGraph
 {
     if (self.processingGraph) {
@@ -258,8 +258,8 @@ bool _allowNextNote;
     }
     
     NSLog(@"startGraph");
-
 }
+
 - (void) stopAUGraph {
     
     NSLog (@"Stopping audio processing graph");
@@ -285,46 +285,45 @@ bool _allowNextNote;
     }
    
     if(pn < 0 || pn > 127) {
+        NSLog(@"returning as value is above 127");
         return;
     }
     
-     pn=pn-1;
+     //pn=pn-1;
     
-    NSLog(@"SONG AUDIO SETUP SAMPLER set pn %d WITH TRACK %@", pn, track);
-        NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
+    NSLog(@"SONG AUDIO SETUP SAMPLER set pn %d WITH TRACK %d", pn, track);
+    NSURL *presetURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle] pathForResource:@"yamaha" ofType:@"sf2"]];
         /* bankURL = [[NSURL alloc] initFileURLWithPath:[[NSBundle mainBundle]
          pathForResource:@"gs_instruments" ofType:@"dls"]];*/
-    
     //pn = self.currentPresetNumber;
     //pn = self.currentPrefix;
     
     
     NSLog(@"SONG AUDIO ENGINE setupSampler PN set pn/ self.currentPresetNumber %@", [NSString stringWithFormat:@"%d",self.currentPresetNumber]);
     NSLog(@"SONG AUDIO ENGINE setupSampler PN set pn/ currentPrefix %@", [NSString stringWithFormat:@"%d",self.currentPrefix]);
-    
+    NSLog(@"track = %d", track);
     
         if (pn==0) {
             pn=73;
         }
     
-    
     // fill out a bank preset data structure
+    
     AUSamplerBankPresetData bpdata;
-   // if (track==9) {
-    //    bpdata.bankURL  = (__bridge CFURLRef) presetURL;/
-     //   bpdata.bankMSB  = kAUSampler_DefaultPercussionBankMSB;//
-    //    bpdata.bankLSB  = kAUSampler_DefaultBankLSB;///
-    //////    bpdata.presetID = (UInt8) pn;
-   ///
-   /// }else
-   // {
+    if (track==9) {
+        bpdata.bankURL  = (__bridge CFURLRef) presetURL;
+        bpdata.bankMSB  = kAUSampler_DefaultPercussionBankMSB;//
+        bpdata.bankLSB  = kAUSampler_DefaultBankLSB;///
+        bpdata.presetID = (UInt8) pn;
+
+    }else
+    {
         bpdata.bankURL  = (__bridge CFURLRef) presetURL;
         bpdata.bankMSB  = kAUSampler_DefaultMelodicBankMSB;
         bpdata.bankLSB  = kAUSampler_DefaultBankLSB;
         bpdata.presetID = (UInt8) pn;
         
-    //}
-    
+    }
     
     // set the kAUSamplerProperty_LoadPresetFromBank property
     CheckError(AudioUnitSetProperty(unit,
@@ -361,8 +360,6 @@ bool _allowNextNote;
         [self.chordSequences addObject:dataA];
 
     }
-
-    
     
     for (int i=0;i<[self.chordSequences count]; i++)
     {
@@ -396,6 +393,9 @@ bool _allowNextNote;
     for(int i = 0; i < trackCount; i++)
     {
         NSLog(@"LAODING MIDI FILE pn ");
+        NSLog(@"LAODING MIDI FILE pn %u", (unsigned int)trackCount);
+        NSLog(@"LAODING MIDI FILE pn %d", i);
+        
         MusicTrack track = NULL;
         MusicTimeStamp trackLen = 0;
         UInt32 trackLenLen = sizeof(trackLen);
@@ -486,6 +486,7 @@ bool _allowNextNote;
     }];
 
 }
+
 -(void)clearMainSequence
 {
     NSLog(@"CLEAR MAIN");
@@ -514,6 +515,7 @@ bool _allowNextNote;
         MusicTrackCut(track, 0, trackLen);
     }
 }
+
 -(void)copyTracksFromSequence:(SequenceData*)sequence
 {
     UInt32 trackCount;
@@ -626,9 +628,8 @@ bool _allowNextNote;
     MusicPlayerSetTime(self.musicPlayer, 0.0f);
     MusicPlayerPreroll(self.musicPlayer);
     MusicPlayerStart(self.musicPlayer);
-    
-
 }
+
 -(void)setInstrument:(int)instrument
 {
     instrument=instrument-1;
@@ -715,6 +716,7 @@ bool _allowNextNote;
     
     self.stitchTimer=[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(stitchTimerHandler:) userInfo:nil repeats:YES];
 }
+
 -(void)stitchTimerHandler:(NSTimer*)timer
 {
     BOOL  continuous=[[[NSUserDefaults standardUserDefaults]valueForKey:@"continuousBreath"]boolValue];
@@ -766,8 +768,6 @@ bool _allowNextNote;
         }
     }
     
-    
-    
     if (pos>=self.fullLength) {
         [self stopBreath];
         
@@ -777,9 +777,7 @@ bool _allowNextNote;
        // [timer invalidate];
         
     }
-    
 }
-
 
 -(void)stopBreath
 {
@@ -859,15 +857,13 @@ void MyMIDINotifyProc2 (const MIDINotification  *message, void *refCon) {
    // NSString *inName = [NSString stringWithFormat:@"Magical MIDI Destination77"];
    // s = MIDIDestinationCreate(virtualMidi, (__bridge CFStringRef)inName, ReadProc,  (__bridge void *)self, &virtualInTemp);
     
-     //s = MIDIClientCreate((CFStringRef)@"How ya MIDI Client45", nil, (__bridge void *)(self), &virtualMidi);
-    
+    //s = MIDIClientCreate((CFStringRef)@"How ya MIDI Client45", nil, (__bridge void *)(self), &virtualMidi);
     s = MIDIOutputPortCreate(virtualMidi, (CFStringRef)@"how ya Output Port876", &outputPort);
 
 }
 
 void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcConnRefCon)
 {
-    
     SongAudioEngine  *enginge=refToSelf;
     
   //  MIDIPacket *packet = (MIDIPacket *)packetList->packet;
@@ -879,7 +875,6 @@ void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcC
             Byte note = packet->data[1] & 0x7F;
             Byte velocity = packet->data[2] & 0x7F;
             
-            
            // OSStatus result = noErr;
             for (int i=0; i<[enginge.instruments count]; i++) {
                 Instrument  *inst=enginge.instruments[i];
@@ -889,11 +884,8 @@ void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcC
             }
        }
         packet = MIDIPacketNext(packet);
-        
         [enginge sendPacketList:packetList];
     }*/
-   
-
     
     MIDIPacket *packet = (MIDIPacket *)packetList->packet;
     for (int i=0; i < packetList->numPackets; i++) {
@@ -913,23 +905,15 @@ void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcC
             Instrument  *inst=enginge.instruments[0];
                 AudioUnit payer=inst.instrumentUnit;
                 MusicDeviceMIDIEvent (payer,midiStatus,note,velocity,0);
-            
-           //  NSLog(@"midicommand");
-            
+                //  NSLog(@"midicommand");
           }
-            
-            
-
        // }
-
         packet = MIDIPacketNext(packet);
-        
-     
     }
-   // UInt8 noteOn[]  = {192, refToSelf.currentPresetNumber , 0 };
-   // [refToSelf sendBytes:noteOn size:sizeof(&noteOn)];
-    [refToSelf sendPacketList:packetList];
     
+    // UInt8 noteOn[]  = {192, refToSelf.currentPresetNumber , 0 };
+    // [refToSelf sendBytes:noteOn size:sizeof(&noteOn)];
+    [refToSelf sendPacketList:packetList];
 }
 
 #pragma mark Send Routines
@@ -963,11 +947,6 @@ void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcC
                 // Send it
                 MIDISend(outputPort, outputEndpoint, packetList);
             }
-        }else
-        {
-           // NSLog(@"Not Wrong");
-            
-
         }
     }
 }
@@ -977,6 +956,5 @@ void ReadProc(const MIDIPacketList *packetList, void *readProcRefCon, void *srcC
     [self setupReceiver];
 
 }
-
 
 @end

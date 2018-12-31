@@ -276,11 +276,10 @@
 
 }
 -(void)btleManagerBreathBegan:(BTLEManager*)manager{}
+
+
 -(void)btleManagerBreathBeganWithInhale:(BTLEManager*)manager{
 
-    NSLog(@"EXHALLING STILL");
-
-    
     float setting=[[[NSUserDefaults standardUserDefaults]valueForKey:@"threshold"]floatValue];
     
     float velocity=manager.percentOfMax*1280;
@@ -312,10 +311,7 @@
 
 
 -(void)btleManagerBreathBeganWithExhale:(BTLEManager*)manager{
-
-    NSLog(@"EXHALLING STILL");
-    
-    
+ 
     float setting=[[[NSUserDefaults standardUserDefaults]valueForKey:@"threshold"]floatValue];
     
     float velocity=manager.percentOfMax*1280;

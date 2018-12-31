@@ -55,20 +55,17 @@
 }
 -(void)songSelected:(NSString*)songname
 {
-
-   // [self cleanup];
-    
     [self createAUGraph];
-   self.tempo=110;
-    
+    self.tempo=110;
     self.currentSongName=songname;
-    
     [self playMidiFile];
 }
+
 -(int)getTheTempo
 {
     return self.tempo;
 }
+
 -(void)tempoDown
 {
     self.tempo-=5;
@@ -79,7 +76,6 @@
     MusicTrack tempoTrack;
     MusicSequenceGetTempoTrack (self.introMusicSequence.sequence, &tempoTrack);
     MusicTrackNewExtendedTempoEvent(tempoTrack, 0, self.tempo);
-
 }
 
 -(void)tempoUp
@@ -89,6 +85,7 @@
     MusicSequenceGetTempoTrack (self.introMusicSequence.sequence, &tempoTrack);
     MusicTrackNewExtendedTempoEvent(tempoTrack, 0, self.tempo);
 }
+
 - (id) init
 {
     if ( self = [super init] ) {
@@ -99,12 +96,7 @@
             [self.instruments addObject:instrument];
         }
         // [self setupStereoStreamFormat];
-       
-        
-        
-        
         // [self setupSampler:self.presetNumber];
-        
     }
     
     return self;
@@ -112,14 +104,11 @@
 
 #pragma mark - Audio setup
 
-
 -(void)createAUGraph
 {
     
     OSStatus result = noErr;
 	AUNode ioNode, mixerNode;
-    
-    
     // Specify the common portion of an audio unit's identify, used for both audio units
     // in the graph.
 	AudioComponentDescription cd = {};
@@ -133,7 +122,6 @@
 	cd.componentType = kAudioUnitType_MusicDevice;
 	cd.componentSubType = kAudioUnitSubType_Sampler;
 	
-    
     // Node which will be used to play our midi not with a particular sound font
     AUNode node;
     // Create nodes for all the voices
@@ -186,9 +174,7 @@
         instrument.instrumentUnit=samplerUnit;
         
         NSCAssert (result == noErr, @"Unable to obtain a reference to the Sampler unit. Error code: %d '%.4s'", (int) result, (const char *)&result);
-        
     }
-    
     
     // Create a new mixer unit. This is necessary because we have a number of sampler
     // units which we need to output through the speakers. Each of these channels needs
@@ -239,6 +225,7 @@
 	CAShow(self.processingGraph);
     
 }
+
 - (void) startGraph
 {
     if (self.processingGraph) {
@@ -293,8 +280,6 @@
         bpdata.presetID = (UInt8) pn;
         
    // }
-    
-    
     // set the kAUSamplerProperty_LoadPresetFromBank property
     CheckError(AudioUnitSetProperty(unit,
                                     kAUSamplerProperty_LoadPresetFromBank,
@@ -307,6 +292,7 @@
     
     NSLog (@"sampler ready");
 }
+
 -(void)loadMIDIFileIntro
 {
       NSLog(@"PLAYMIDIFILEINTRO");
@@ -321,11 +307,7 @@
                                      (__bridge CFURLRef) midiFileURL,
                                      0, // can be zero in many cases
                                      kMusicSequenceLoadSMF_ChannelsToTracks), "MusicSequenceFileLoad");
-    
-    
-    
-    
-    
+
     UInt32 trackCount;
     CheckError(MusicSequenceGetTrackCount(self.introMusicSequence.sequence, &trackCount), "MusicSequenceGetTrackCount");
     // NSLog(@"Number of tracks: %lu", trackCount);
@@ -361,12 +343,7 @@
             
             SequenceTrack  *vtrack=self.introMusicSequence.tracks[i];
            //CheckError( AudioUnitSetParameter(_mixerUnit, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, i,vtrack.volume, 0),"broken");
-        
-        
-        
     }
-    
-    
     
     CheckError(MusicPlayerSetSequence(_introMusicPlayer,self.introMusicSequence.sequence), "MusicPlayerSetSequence");
     CheckError(MusicPlayerPreroll(_introMusicPlayer), "MusicPlayerPreroll");
@@ -431,7 +408,6 @@
     MusicTrackNewExtendedTempoEvent(tempoTrack, 0, self.tempo);
     
     CheckError(MusicPlayerStart(self.introMusicPlayer), "MusicPlayerStart");
-
-
 }
+
 @end
